@@ -1,0 +1,167 @@
+.reel {
+  position: relative;
+  overflow: hidden;
+
+  background: var(--black);
+  border-radius: var(--r-lg);
+
+  padding: clamp(18px, 2.4vw, 30px);
+
+  min-height: clamp(620px, 85vh, 900px);
+}
+
+.reel__grid {
+  position: relative;
+
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: clamp(14px, 1.8vw, 22px);
+
+  will-change: transform;
+}
+.reel__tile {
+  aspect-ratio: 16 / 10;
+
+  border-radius: 16px;
+
+  background: linear-gradient(
+    135deg,
+    #1a1b1d 0%,
+    #101113 55%,
+    #0c0d0f 100%
+  );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.045);
+}
+
+.reel__glow {
+  position: absolute;
+
+  width: 520px;
+  height: 520px;
+
+  border-radius: var(--r-pill);
+
+  background: radial-gradient(
+    circle,
+    rgba(196, 205, 28, 0.16) 0%,
+    rgba(196, 205, 28, 0) 70%
+  );
+
+  mix-blend-mode: screen;
+
+  pointer-events: none;
+
+  opacity: 0;
+
+  transform: translate(-50%, -50%);
+
+  transition: opacity 0.5s var(--ease);
+
+  z-index: 3;
+}
+
+.reel__center {
+  position: absolute;
+
+  inset: 0;
+
+  display: grid;
+
+  place-content: center;
+
+  justify-items: center;
+
+  gap: 10px;
+
+  pointer-events: none;
+
+  z-index: 4;
+}
+
+.reel__label {
+  background: var(--black-2);
+  color: var(--bg);
+
+  border-radius: var(--r-pill);
+
+  padding: 6px 16px;
+  margin-bottom: -4px;
+
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 14px;
+
+  transform: translateX(14px) rotate(-9deg);
+
+  will-change: transform;
+}
+.reel__disc:hover ~ .reel__label {
+  --hover-y: -8px;
+}
+
+.reel__disc {
+  position: relative;
+
+  width: 74px;
+  height: 74px;
+
+  border-radius: var(--r-pill);
+
+  background: var(--white);
+
+  display: grid;
+
+  place-items: center;
+
+  pointer-events: auto;
+
+  transition:
+    transform 0.45s var(--ease),
+    box-shadow 0.45s var(--ease);
+}
+.reel_dics:hover {
+  transform: scale(1.08);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.16);
+}
+
+.reel__disc:hover {
+  transform: scale(1.08);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.16);
+}
+
+.reel__disc svg {
+  transition:
+    transform 0.45s var(--ease);
+}
+
+.reel__disc:hover svg {
+  transform: rotate(-12deg) scale(1.08);
+}
+
+.reel__ring {
+  position: absolute;
+  inset: 0;
+
+  border-radius: var(--r-pill);
+
+  border: 1px solid rgba(255, 255, 255, 0.55);
+
+  /* animation: pulse-ring 2.8s var(--ease) infinite; */
+
+  transition:
+    inset 0.45s var(--ease);
+}
+
+/* .reel__disc:hover .reel__ring {
+  inset: -5px;
+} */
+.reel__center:has(.reel__disc:hover) .reel__label {
+  transform:
+    translateX(14px)
+    translateY(-8px)
+    rotate(-9deg);
+}

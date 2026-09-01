@@ -1,0 +1,62 @@
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-geo);
+  overflow-x: hidden;
+}
+
+img { display: block; max-width: 100%; }
+button { font: inherit; cursor: pointer; }
+a { color: var(--ink); text-decoration: none; transition: color 0.4s var(--ease); }
+a:hover { color: var(--ink-2); }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+/* layout */
+.shell { max-width: var(--shell); margin: 0 auto; padding: 0 var(--pad); }
+.section { padding-bottom: var(--gap-section); }
+
+/* shared type */
+.eyebrow {
+  display: flex; align-items: center; justify-content: center; gap: 16px;
+  font-family: var(--font-serif); font-style: italic; font-size: 19px; color: var(--ink-2);
+}
+.eyebrow::before, .eyebrow::after { content: ''; width: 44px; height: 1px; background: var(--line); }
+.eyebrow--script { font-family: var(--font-script); font-style: normal; font-size: 30px; }
+.eyebrow--dark { color: #8c8e90; }
+.eyebrow--dark::before, .eyebrow--dark::after { background: rgba(255, 255, 255, 0.16); }
+
+.h2 {
+  font-family: var(--font-ui); font-weight: 400;
+  font-size: clamp(28px, 4vw, 42px); letter-spacing: -0.03em;
+  text-align: center; margin: 14px 0 clamp(34px, 4vw, 54px);
+}
+.h2 .muted { color: var(--ink-3); }
+
+/* pill button + arrow badge */
+.pill {
+  display: inline-flex; align-items: center; gap: 12px;
+  background: var(--black); color: var(--bg);
+  border: 0; border-radius: var(--r-pill); padding: 5px 5px 5px 20px;
+  font-family: var(--font-geo); font-size: 13.5px;
+  transition: transform 0.5s var(--ease);
+}
+.pill:hover { color: var(--bg); }
+.pill--ghost {
+  background: transparent; color: #f4f4f3;
+  border: 1px solid rgba(255, 255, 255, 0.22); padding: 11px 11px 11px 24px;
+  transition: transform 0.5s var(--ease), border-color 0.5s var(--ease);
+}
+.pill--ghost:hover { border-color: rgba(255, 255, 255, 0.55); color: #f4f4f3; }
+.badge {
+  width: 26px; height: 26px; border-radius: var(--r-pill);
+  background: var(--bg); display: grid; place-items: center;
+  overflow: hidden; position: relative;
+}
+.pill--ghost .badge { background: transparent; border: 1px solid rgba(255, 255, 255, 0.22); width: 24px; height: 24px; }
+.badge svg { transition: transform 0.5s var(--ease); }
+.pill:hover .badge svg { transform: translateX(14px); }

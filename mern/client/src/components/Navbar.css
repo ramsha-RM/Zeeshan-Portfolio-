@@ -1,0 +1,110 @@
+.nav {
+  position: fixed; inset: 0 0 auto; z-index: 200;
+  padding: 14px 0; border-bottom: 1px solid transparent;
+  transition: padding 0.5s var(--ease), background 0.5s var(--ease), border-color 0.5s var(--ease);
+}
+.nav--stuck {
+  padding: 8px 0; border-bottom-color: var(--line);
+  background: rgba(247, 247, 246, 0.78);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+}
+.nav__inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.nav__logo { display: flex; width: 34px; color: var(--ink); transition: transform 0.8s var(--ease); }
+.nav__logo:hover { transform: rotate(180deg); }
+
+.nav__actions { display: flex; align-items: center; gap: 10px; position: relative; }
+
+/* hamburger — the same pill as "Let's Talk" */
+.nav__burger {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  margin: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #b8b8b8;
+  border-radius: 50%;
+  background: #fff;
+
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    0 2px 5px rgba(0, 0, 0, 0.02);
+
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.nav__burger:hover {
+  background: #fff;
+}
+
+.nav__burgerIcon {
+  position: relative;
+  width: 16px;
+  height: 12px;
+  display: block;
+}
+
+.nav__burgerIcon i {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  width: 13px;
+  height: 1.5px;
+
+  background: #000;
+  border-radius: 2px;
+
+  transform-origin: center;
+  transition: transform 0.4s var(--ease);
+}
+
+.nav__burgerIcon i:first-child {
+  transform: translate(-50%, -50%) translateY(-3px);
+}
+
+.nav__burgerIcon i:last-child {
+  transform: translate(-50%, -50%) translateY(3px);
+}
+
+.nav__burger.is-open .nav__burgerIcon i:first-child {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.nav__burger.is-open .nav__burgerIcon i:last-child {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+/* menu panel */
+.nav__panel {
+  position: absolute; top: calc(100% + 14px); right: 0; min-width: 230px;
+  display: flex; flex-direction: column; padding: 14px 8px;
+  background: rgba(247, 247, 246, 0.86);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--line); border-radius: 20px;
+  box-shadow: 0 24px 48px -22px rgba(10, 11, 12, 0.35);
+  opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(-10px);
+  transition: opacity 0.5s var(--ease), transform 0.5s var(--ease), visibility 0.5s;
+}
+.nav__panel.is-open { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0); }
+
+.nav__panel a {
+  position: relative; padding: 9px 16px; font-size: 15px; color: var(--ink-2);
+  opacity: 0; transform: translateX(14px);
+  transition: opacity 0.5s var(--ease) var(--d), transform 0.5s var(--ease) var(--d),
+    color 0.4s ease, padding-left 0.4s var(--ease);
+}
+.nav__panel.is-open a { opacity: 1; transform: translateX(0); }
+.nav__panel a:hover { color: var(--ink); padding-left: 22px; }
+.nav__panel a.is-active { color: var(--ink); }
+
+.nav__ul {
+  position: absolute; left: 16px; right: 16px; bottom: 6px; height: 1px; background: var(--ink);
+  transform: scaleX(0); transform-origin: right; transition: transform 0.45s var(--ease);
+}
+.nav__panel a:hover .nav__ul, .nav__panel a.is-active .nav__ul { transform: scaleX(1); transform-origin: left; }
