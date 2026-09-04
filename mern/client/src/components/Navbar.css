@@ -1,10 +1,11 @@
 .nav {
   position: fixed; inset: 0 0 auto; z-index: 200;
   padding: 14px 0; border-bottom: 1px solid transparent;
-  transition: padding 0.5s var(--ease), background 0.5s var(--ease), border-color 0.5s var(--ease);
+  transition: padding 0.5s var(--ease),
+   background 0.5s var(--ease), border-color 0.5s var(--ease);
 }
 .nav--stuck {
-  padding: 8px 0; border-bottom-color: var(--line);
+  padding: 8px 0; border-bottom-color: var(--line);  
   background: rgba(247, 247, 246, 0.78);
   backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
 }

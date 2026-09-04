@@ -1,8 +1,17 @@
-.contact { padding: 0 var(--pad); }
+.contact { padding: 0 var(--pad) clamp(10px, 2vw, 24px); }
 .contact__block {
   position: relative; overflow: hidden;
-  background: var(--black-2); border-radius: var(--r-lg) var(--r-lg) 0 0;
+  background: var(--black-2); border-radius: var(--r-lg);
   padding: clamp(70px, 9vw, 120px) clamp(20px, 4vw, 48px) 26px;
+}
+.contact__block::after {
+  content: '';
+  position: absolute;
+  left: clamp(36px, 8vw, 120px);
+  right: clamp(36px, 8vw, 120px);
+  bottom: 10px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.12);
 }
 .contact__halo {
   position: absolute; left: 50%; top: 8%; width: min(1100px, 120%); height: 520px;

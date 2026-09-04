@@ -24,9 +24,7 @@ export default function App() {
       <Navbar />
 
       <main>
-        <section ref={heroRef}>
-          <Hero />
-        </section>
+        <Hero heroRef={heroRef} />
 
         <Showreel showreelRef={showreelRef} />
 

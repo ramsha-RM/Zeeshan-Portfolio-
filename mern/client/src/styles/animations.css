@@ -12,29 +12,37 @@
 
 [data-reveal] {
   opacity: 0;
-  transform: translateY(28px);
+  transform: translate3d(0, 30px, 0) scale(0.995);
   transition:
-    opacity 0.95s var(--ease) var(--d, 0s),
-    transform 0.95s var(--ease) var(--d, 0s);
+    opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) var(--d, 0s),
+    transform 0.85s cubic-bezier(0.16, 1, 0.3, 1) var(--d, 0s);
+  will-change: opacity, transform;
+  backface-visibility: hidden;
 }
 
+.reveal-left[data-reveal],
 [data-reveal="left"] {
-  transform: translateX(-34px);
+  transform: translate3d(-40px, 0, 0) scale(0.995);
 }
 
+.reveal-right[data-reveal],
 [data-reveal="right"] {
-  transform: translateX(34px);
+  transform: translate3d(40px, 0, 0) scale(0.995);
 }
 
+.reveal-left[data-reveal].is-in,
+.reveal-right[data-reveal].is-in,
 [data-reveal].is-in {
   opacity: 1;
-  transform: none;
+  transform: translate3d(0, 0, 0);
 }
 
 [data-load] {
   transition:
     opacity 1s var(--ease) var(--d, 0s),
     transform 1s var(--ease) var(--d, 0s);
+  will-change: opacity, transform;
+  backface-visibility: hidden;
 }
 
 [data-load="script"] {

@@ -36,11 +36,8 @@
 // }
 import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-gsap.registerPlugin(ScrollTrigger);
-
-export default function useFlyIn() {
+export default function useFlyIn({ stagger = 0.14, offset = 0 } = {}) {
   const ref = useRef(null);
 
   useLayoutEffect(() => {
@@ -52,57 +49,58 @@ export default function useFlyIn() {
 
     if (!chips.length) return;
 
+    let observer;
+
     const ctx = gsap.context(() => {
       const right =
         container.classList.contains("caps__col--right");
 
-      chips.forEach((chip, index) => {
+      const startPositions = chips.map((chip, index) => {
         const direction = right ? 1 : -1;
 
-        const startX =
-          direction * [180, 240, 150][index % 3];
+        return {
+          x: direction * [180, 240, 150][index % 3],
+          y: [-80, 60, -45][index % 3],
+          rotation: direction * [-12, 9, -7][index % 3],
+        };
+      });
 
-        const startY =
-          [-80, 60, -45][index % 3];
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        gsap.set(chips, { x: 0, y: 0, rotation: 0, scale: 1, opacity: 1 });
+        return;
+      }
 
-        const startRotation =
-          direction * [-12, 9, -7][index % 3];
+      chips.forEach((chip, index) => {
+        gsap.set(chip, { ...startPositions[index], scale: 0.9, opacity: 0 });
+      });
 
-        const endX =
-          direction * [18, -12, 10][index % 3];
-
-        const endY =
-          [8, -12, 6][index % 3];
-
-        const endRotation =
-          direction * [3, -2, 2][index % 3];
-
-        gsap.fromTo(
-          chip,
-          {
-            x: startX,
-            y: startY,
-            rotation: startRotation,
-            scale: 0.9,
-            opacity: 0,
-          },
-          {
-            x: endX,
-            y: endY,
-            rotation: endRotation,
+      const play = () => {
+        chips.forEach((chip, index) => {
+          gsap.to(chip, {
+            x: 0,
+            y: 0,
+            rotation: 0,
             scale: 1,
             opacity: 1,
-            ease: "none",
-            scrollTrigger: {
-              trigger: container,
-              start: "top 90%",
-              end: "top 35%",
-              scrub: 1,
-              invalidateOnRefresh: true,
-            },
-          }
-        );
-      });
+            delay: offset + index * stagger,
+            duration: 0.8,
+            ease: "power3.out",
+          });
+        });
+      };
+
+      observer = new IntersectionObserver(
+        (entries) => {
+          if (!entries.some((entry) => entry.isIntersecting)) return;
+          play();
+          observer.disconnect();
+        },
+        { threshold: 0.2, rootMargin: "0px 0px -8% 0px" }
+      );
+
+      observer.observe(container);
+
+      return () => observer.disconnect();
     }, container);
 
     const cleanups = chips.map((chip) => {
@@ -169,6 +167,7 @@ export default function useFlyIn() {
     });
 
     return () => {
+      observer?.disconnect();
       cleanups.forEach((cleanup) => cleanup());
       ctx.revert();
     };

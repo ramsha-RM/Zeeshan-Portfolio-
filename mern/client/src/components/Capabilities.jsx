@@ -45,7 +45,6 @@ export default function Capabilities() {
   return (
     <section id="experts" className="section caps">
       <div className="shell caps__grid">
-
         <div className="caps__col caps__col--left" ref={left}>
           {capabilities.left.map((c) => (
             <Chip key={c.label} {...c} fly="left" />

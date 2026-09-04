@@ -2,7 +2,6 @@ import { hero } from '../data/site.js';
 import portrait from '../assets/hero-portrait.png';
 import useHeadlineFit from '../hooks/useHeadlineFit.js';
 import useLoadSequence from '../hooks/useLoadSequence.js';
-import useParallax from '../hooks/useParallax.js';
 import useCountUp from '../hooks/useCountUp.js';
 import { useRef } from 'react';
 import '../hooks/useTransition.js'; 
@@ -20,7 +19,6 @@ function Stat({ value, suffix, label }) {
 
 export default function Hero({ heroRef }) {
   const { headline, script } = useHeadlineFit(78);
-  const img = useParallax(0.09);
   useLoadSequence();
 
   return (
@@ -33,7 +31,7 @@ export default function Hero({ heroRef }) {
       </div>
 
       <div className="hero__photoWrap">
-        <img className="hero__photo" data-load="portrait" ref={img} src={portrait} alt={hero.portraitAlt} />
+        <img className="hero__photo" data-load="portrait" src={portrait} alt={hero.portraitAlt} />
         <div className="hero__overlay">
           <div className="shell hero__overlayShell">
             <div className="hero__stats" data-load="stats">

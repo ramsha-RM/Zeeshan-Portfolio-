@@ -39,7 +39,9 @@ export const projects = [
   { slug: 'strida', name: 'Strida', tags: ['portfolio', 'sidebar'], image: '' },
   { slug: 'bravo', name: 'Bravo', tags: ['UI/UX', 'App'], image: '' },
   { slug: 'nitro', name: 'Nitro', tags: ['Design System', 'Web'], image: '' },
-  { slug: 'fargo', name: 'Fargo', tags: ['SaaS', 'Web'], image: '' }
+  { slug: 'fargo', name: 'Fargo', tags: ['SaaS', 'Web'], image: '' },
+  { slug: 'atlas', name: 'Atlas', tags: ['Branding', 'Platform'], image: '' },
+  { slug: 'solace', name: 'Solace', tags: ['Product', 'Mobile'], image: '' }
 ];
 
 export const about = {

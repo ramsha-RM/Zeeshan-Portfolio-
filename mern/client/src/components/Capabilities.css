@@ -46,11 +46,11 @@
 }
 
 .caps__col--left {
-  align-items: flex-start;
+  align-items: flex-end;
 }
 
 .caps__col--right {
-  align-items: flex-end;
+  align-items: flex-start;
 }
 
 .caps__col--left .chip:nth-child(2) {
