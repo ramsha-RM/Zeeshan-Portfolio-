@@ -3,6 +3,7 @@
   padding: 14px 0; border-bottom: 1px solid transparent;
   transition: padding 0.5s var(--ease),
    background 0.5s var(--ease), border-color 0.5s var(--ease);
+   /* background: transparent; */
 }
 .nav--stuck {
   padding: 8px 0; border-bottom-color: var(--line);  

@@ -85,8 +85,8 @@
 //     </section>
 //   );
 // }
-
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { projects as fallback } from "../data/site.js";
 import Eyebrow from "./ui/Eyebrow.jsx";
 import Icon from "./ui/Icon.jsx";
@@ -97,13 +97,14 @@ import "./Projects.css";
 
 export default function Projects() {
   const [items, setItems] = useState(fallback.slice(0, 6));
+  const apiBase = import.meta.env.VITE_API_URL || '';
 
   const heading = useSplitText();
   const { zone, dot } = useCursorFollower();
   const sectionRef = useProjectsAnimation([items.length]);
 
   useEffect(() => {
-    fetch("/api/projects")
+    fetch(`${apiBase}/api/projects`)
       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
       .then((d) => {
         if (Array.isArray(d) && d.length) {
@@ -111,7 +112,7 @@ export default function Projects() {
         }
       })
       .catch(() => {});
-  }, []);
+  }, [apiBase]);
 
   return (
     <section id="projects" className="section shell" ref={sectionRef}>
@@ -122,7 +123,7 @@ export default function Projects() {
       </h2>
 
       <div className="projects" ref={zone}>
-        {items.map((p, i) => (  
+        {items.map((p, i) => (
           <article
             className="project"
             key={p.slug}
@@ -157,10 +158,12 @@ export default function Projects() {
         ))}
       </div>
 
-      <div className="projects__cursor" ref={dot} aria-hidden="true">
-        View
-        <Icon name="arrow" size={12} stroke="#f7f7f6" width={2} />
-      </div>
+      {createPortal(
+        <div className="projects__cursor" ref={dot} aria-hidden="true">
+          <Icon name="arrow" size={22} stroke="#f7f7f6" width={2} />
+        </div>,
+        document.body
+      )}
     </section>
   );
 }

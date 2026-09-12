@@ -5,19 +5,23 @@ dotenv.config({
   path: new URL('../../.env', import.meta.url),
 });
 
-const connectDB = async () => {
-  const uri = process.env.MONGO_URI;
+const fallbackMongoUri = 'mongodb://127.0.0.1:27017/portfolio';
 
-  if (!uri) {
-    throw new Error('MONGO_URI is missing from server/.env');
-  }
+const connectDB = async () => {
+  const uri = process.env.MONGO_URI || fallbackMongoUri;
 
   try {
-    await mongoose.connect(uri);
+    await mongoose.connect(uri, {
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 20000,
+      connectTimeoutMS: 10000,
+      maxPoolSize: 10,
+    });
 
     console.log('MongoDB Connected');
+    return mongoose.connection;
   } catch (error) {
-    console.error('MongoDB connection failed:', error);
+    console.error('MongoDB connection failed:', error.message);
     throw error;
   }
 };
