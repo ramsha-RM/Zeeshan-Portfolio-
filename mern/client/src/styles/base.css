@@ -25,6 +25,13 @@ body {
   font-family: var(--font-geo);
 }
 
+@media (max-width: 768px) {
+  .shell {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+}
+
 section, .full-viewport-section {
   width: 100%;
   max-width: 100%;

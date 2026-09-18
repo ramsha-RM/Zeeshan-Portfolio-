@@ -16,6 +16,30 @@
 
 .nav__actions { display: flex; align-items: center; gap: 10px; position: relative; }
 
+@media (max-width: 700px) {
+  .nav__inner {
+    gap: 12px;
+  }
+
+  .nav__actions {
+    gap: 8px;
+  }
+
+  .nav__panel {
+    min-width: min(78vw, 260px);
+  }
+}
+
+@media (max-width: 480px) {
+  .nav__actions {
+    width: auto;
+  }
+
+  .nav__panel {
+    right: -2px;
+    min-width: min(82vw, 220px);
+  }
+}
 /* hamburger — the same pill as "Let's Talk" */
 .nav__burger {
   width: 42px;

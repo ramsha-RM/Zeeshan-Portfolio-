@@ -22,7 +22,7 @@
   --font-script: 'Ms Madi', 'Sacramento', cursive;
 
   /* layout + motion */
-  --shell: 1200px;
+  --shell: clamp(1100px, 62vw, 1440px);
   --pad: clamp(18px, 4vw, 40px);
   --gap-section: clamp(70px, 10vw, 140px);
   --r-lg: 26px;
