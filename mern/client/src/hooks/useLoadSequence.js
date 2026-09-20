@@ -33,27 +33,36 @@ export default function useLoadSequence() {
 
         // Re-measure ScrollTrigger positions once every image has actually
         // finished loading, so trigger points are calculated against the
-        // page's final, settled height (fixes the double-scrollbar-on-fresh-load issue).
+        // page's final, settled height.
         const imgs = Array.from(document.images);
         const pending = imgs.filter((img) => !img.complete);
 
         if (pending.length === 0) {
           ScrollTrigger.refresh();
-        } else {
-          let remaining = pending.length;
-          const done = () => {
-            remaining -= 1;
-            if (remaining === 0) ScrollTrigger.refresh();
-          };
-          pending.forEach((img) => {
-            img.addEventListener('load', done, { once: true });
-            img.addEventListener('error', done, { once: true });
-          });
+          return;
         }
+
+        let remaining = pending.length;
+        const done = () => {
+          remaining -= 1;
+          if (remaining === 0) ScrollTrigger.refresh();
+        };
+
+        pending.forEach((img) => {
+          img.addEventListener('load', done, { once: true });
+          img.addEventListener('error', done, { once: true });
+        });
       });
     };
 
-    if (document.readyState === 'complete') go();
-    else addEventListener('load', go, { once: true });
+    // Initialize deterministically on mount even if the document has already
+    // reached the load state before this hook runs.
+    go();
+
+    if (document.readyState === 'loading') {
+      const onLoad = () => go();
+      window.addEventListener('load', onLoad, { once: true });
+      return () => window.removeEventListener('load', onLoad);
+    }
   }, []);
 }

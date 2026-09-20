@@ -73,21 +73,21 @@ export default function useShowreelTrans(gridRef, labelRef) {
 
     if (!grid) return;
 
+    const prefs = typeof window !== "undefined" ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
+    const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+    const forceMotion = params?.get("motion") === "on" || localStorage.getItem("forceMotion") === "1";
+
     const ctx = gsap.context(() => {
       const tiles = gsap.utils.toArray(grid.querySelectorAll(".reel__tile"));
 
-      // Reduced motion — skip parallax entirely
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      // Respect the OS/browser motion preference unless explicitly forced on
+      // for debugging or QA testing.
+      if (prefs?.matches && !forceMotion) {
         if (tiles.length) gsap.set(tiles, { y: 0 });
-        if (label) gsap.set(label, { x: 0, y: 0, rotation: 0 });
+        if (label) gsap.set(label, { x: 0, y: 0, rotation: 0, opacity: 1 });
         return;
       }
 
-      // Each row drifts upward at its own rate — tiles within the same
-      // row always share the same distance, so left/right stay perfectly
-      // aligned. The first row travels furthest, so it visibly tucks
-      // away together as the section scrolls; later rows travel
-      // progressively less.
       tiles.forEach((tile, i) => {
         const row = Math.floor(i / 2);
         const distance = row === 0 ? 140 : 70 + row * 26;
@@ -108,7 +108,6 @@ export default function useShowreelTrans(gridRef, labelRef) {
         );
       });
 
-      // Label sweeps wider and rotates more, so the motion reads clearly
       if (label) {
         gsap.fromTo(
           label,

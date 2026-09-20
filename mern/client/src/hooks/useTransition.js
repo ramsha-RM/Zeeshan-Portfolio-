@@ -11,28 +11,32 @@ export default function useTransition(heroRef, showreelRef) {
 
     if (!hero || !showreel) return;
 
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        showreel,
-        {
-          yPercent: 8,
-          scale: 0.985,
-        },
-        {
-          yPercent: 0,
-          scale: 1,
-          ease: "power2.out",
-
-          scrollTrigger: {
-            trigger: showreel,
-            start: "top bottom",
-            end: "top top",
-            scrub: 0.8,
+    const run = () => {
+      const ctx = gsap.context(() => {
+        gsap.fromTo(
+          showreel,
+          {
+            yPercent: 8,
+            scale: 0.985,
           },
-        }
-      );
-    });
+          {
+            yPercent: 0,
+            scale: 1,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: showreel,
+              start: "top bottom",
+              end: "top top",
+              scrub: 0.8,
+            },
+          }
+        );
+      }, showreel);
 
-    return () => ctx.revert();
+      return () => ctx.revert();
+    };
+
+    const rafId = requestAnimationFrame(run);
+    return () => cancelAnimationFrame(rafId);
   }, [heroRef, showreelRef]);
 }
