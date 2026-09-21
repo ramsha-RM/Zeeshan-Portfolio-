@@ -57,7 +57,7 @@
 
 [data-load="portrait"] {
   opacity: 0;
-  transform: translateX(-50%) scale(1.05);
+  transform: none;
   transition-duration: 1.5s;
 }
 
@@ -78,7 +78,7 @@
 
 .is-ready [data-load="portrait"] {
   opacity: 1;
-  transform: translateX(-50%) scale(1);
+  transform: none;
 }
 
 .is-ready [data-load="stats"] {

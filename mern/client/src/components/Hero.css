@@ -16,17 +16,25 @@
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
 .hero__mask { overflow: hidden; text-align: center; }
-.hero__photoWrap { position: relative; width: 100%; margin-top: clamp(-30px, -2vw, 0px); }
+.hero__photoWrap {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  width: 100%;
+  margin-top: clamp(-30px, -2vw, 0px);
+  overflow: hidden;
+}
 .hero__photo {
   display: block;
   width: min(1560px, 100%);
   max-width: 100%;
-  margin-left: 50%;
-  transform: translateX(-50%);
+  margin: 0 auto;
+  transform: none;
   transform-origin: center bottom;
   mix-blend-mode: multiply;
   object-fit: cover;
-  object-position: center bottom;
+  object-position: center center;
   -webkit-mask-image: none;
   mask-image: none;
 }
@@ -62,6 +70,12 @@
   .hero__stats {
     right: clamp(18px, 2vw, 26px);
     bottom: clamp(150px, 20vw, 270px);
+  }
+
+  .hero__photo {
+    width: 100vw;
+    transform: none;
+    margin: 0;
   }
 }
 
