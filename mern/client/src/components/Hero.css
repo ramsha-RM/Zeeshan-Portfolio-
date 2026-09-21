@@ -23,7 +23,7 @@
   align-items: flex-end;
   width: 100%;
   margin-top: clamp(-30px, -2vw, 0px);
-  overflow: hidden;
+  overflow: visible;
 }
 .hero__photo {
   display: block;
@@ -33,7 +33,7 @@
   transform: none;
   transform-origin: center bottom;
   mix-blend-mode: multiply;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center center;
   -webkit-mask-image: none;
   mask-image: none;
@@ -73,9 +73,10 @@
   }
 
   .hero__photo {
-    width: 100vw;
+    width: min(1200px, 100%);
     transform: none;
-    margin: 0;
+    margin: 0 auto;
+    object-fit: contain;
   }
 }
 
