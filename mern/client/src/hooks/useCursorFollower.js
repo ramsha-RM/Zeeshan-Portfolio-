@@ -35,10 +35,12 @@ export default function useCursorFollower() {
         "translate(" + cx + "px," + cy + "px) translate(-50%,-50%) scale(" +
         (inside ? 1 : 0.4) +
         ")";
-      raf =
-        inside || Math.abs(x - cx) > 0.2 || Math.abs(y - cy) > 0.2
-          ? requestAnimationFrame(loop)
-          : null;
+
+      if (inside) {
+        raf = requestAnimationFrame(loop);
+      } else {
+        raf = null;
+      }
     };
 
     // Check the pointer against the zone's live bounding box on every move,
@@ -46,22 +48,34 @@ export default function useCursorFollower() {
     const move = (e) => {
       const rect = z.getBoundingClientRect();
       const wasInside = inside;
-      inside =
+      const nextInside =
         e.clientX >= rect.left &&
         e.clientX <= rect.right &&
         e.clientY >= rect.top &&
         e.clientY <= rect.bottom;
 
+      if (!nextInside) {
+        inside = false;
+        if (wasInside || raf) {
+          d.style.opacity = "0";
+          d.style.transform = "translate(" + x + "px," + y + "px) translate(-50%,-50%) scale(0.4)";
+          if (raf) {
+            cancelAnimationFrame(raf);
+            raf = null;
+          }
+        }
+        return;
+      }
+
+      inside = true;
       x = e.clientX;
       y = e.clientY;
 
-      if (inside && !wasInside) {
+      if (!wasInside) {
         // just entered — snap close so it doesn't lag in from far away
         cx = x;
         cy = y;
         d.style.opacity = "1";
-      } else if (!inside && wasInside) {
-        d.style.opacity = "0";
       }
 
       if (!raf) raf = requestAnimationFrame(loop);
