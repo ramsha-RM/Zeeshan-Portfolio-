@@ -20,16 +20,19 @@
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  width: 100%;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
   margin-top: clamp(-30px, -2vw, 0px);
-  overflow: visible;
+  overflow: hidden;
 }
 .hero__photo {
   display: block;
-  width: min(1560px, 100%);
-  max-width: 100%;
+  width: 118%;
+  max-width: 1800px;
+  min-width: 1000px;
   margin: 0 auto;
-  transform: none;
+  transform: translateY(8px);
   transform-origin: center bottom;
   mix-blend-mode: multiply;
   object-fit: contain;
@@ -72,7 +75,7 @@
   }
 
   .hero__photo {
-    width: min(1200px, 100%);
+    width: 100%;
     transform: none;
     margin: 0 auto;
     object-fit: contain;

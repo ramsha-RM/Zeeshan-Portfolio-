@@ -123,7 +123,7 @@
     transform 0.45s var(--ease),
     box-shadow 0.45s var(--ease);
 }
-.reel_dics:hover {
+.reel__disc:hover {
   transform: scale(1.08);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.16);
 }

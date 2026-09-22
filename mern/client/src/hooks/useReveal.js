@@ -16,16 +16,22 @@ export default function useReveal(dependencies = []) {
       }
     });
 
-    const nodes = document.querySelectorAll('[data-reveal]');
+    const nodes = Array.from(document.querySelectorAll('[data-reveal]'));
 
     // Allow manual motion testing even when reduced motion is enabled.
     const params = new URLSearchParams(window.location.search);
-    const forceMotion =
-      params.get('motion') === 'on' ||
-      localStorage.getItem('forceMotion') === '1';
+    let forceMotion = params.get('motion') === 'on';
+
+    try {
+      forceMotion = forceMotion || localStorage.getItem('forceMotion') === '1';
+    } catch {
+      // Ignore storage access issues in stricter browser contexts.
+    }
 
     const prefersReduced =
-      matchMedia('(prefers-reduced-motion: reduce)').matches && !forceMotion;
+      typeof matchMedia === 'function' &&
+      matchMedia('(prefers-reduced-motion: reduce)').matches &&
+      !forceMotion;
 
     if (prefersReduced) {
       nodes.forEach((n) => n.classList.add('is-in'));
@@ -34,10 +40,32 @@ export default function useReveal(dependencies = []) {
 
     // Reveal elements already in the initial viewport before observing.
     const revealIfVisible = (el) => {
+      if (!el || el.classList.contains('is-in')) return;
       const rect = el.getBoundingClientRect();
       const inView = rect.top < window.innerHeight * 0.95 && rect.bottom > 0;
       if (inView) el.classList.add('is-in');
     };
+
+    const checkpoint = () => {
+      nodes.forEach((node) => revealIfVisible(node));
+    };
+
+    // Some browsers or older environments do not support IntersectionObserver.
+    // In that case, fall back to a simple scroll/resize visibility check.
+    if (!('IntersectionObserver' in window)) {
+      checkpoint();
+
+      const onScroll = () => checkpoint();
+      const onResize = () => checkpoint();
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onResize, { passive: true });
+
+      return () => {
+        window.removeEventListener('scroll', onScroll);
+        window.removeEventListener('resize', onResize);
+      };
+    }
 
     const io = new IntersectionObserver(
       (entries, observer) =>
