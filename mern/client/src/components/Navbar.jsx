@@ -3,6 +3,7 @@ import { nav } from '../data/site.js';
 import PillButton from './ui/PillButton.jsx';
 import useStickyHeader from '../hooks/useStickyHeader.js';
 import useScrollSpy from '../hooks/useScrollSpy.js';
+import mainIcon from '../assets/Subtract.png';
 import './Navbar.css';
 
 const IDS = nav.map((n) => n.id);
@@ -25,12 +26,15 @@ export default function Navbar() {
   return (
     <header className={'nav' + (stuck ? ' nav--stuck' : '')}>
       <div className="nav__inner shell">
-        <a href="#top" className="nav__logo" aria-label="Home">
+        <div className="div">
+          <img className="nav__logo" src={mainIcon} alt="Main Icon" />
+        </div>
+        {/* <a href="#top" className="nav__logo" aria-label="Home">
           <svg viewBox="0 0 34 34" width="34" height="34" aria-hidden="true">
             <circle cx="17" cy="17" r="16" fill="none" stroke="currentColor" strokeWidth="1.4" />
             <path d="M22.5 9.5c2.6 3.2 1.4 8.2-1.6 11.4-3 3.2-7.6 4.4-10.2 2.1-2.6-2.3-1.4-7 1.3-10.3 2.7-3.3 7.9-6.4 10.5-3.2Z" fill="currentColor" />
           </svg>
-        </a>
+        </a> */}
 
         <div className="nav__actions" ref={wrap}>
           <button
