@@ -1,21 +1,24 @@
-// import { useEffect, useState } from 'react';
-// import { projects as fallback } from '../data/site.js';
-// import Eyebrow from './ui/Eyebrow.jsx';
-// import Icon from './ui/Icon.jsx';
-// import useSplitText from '../hooks/useSplitText.js';
-// import useCursorFollower from '../hooks/useCursorFollower.js';
-// import useProjectsAnimation from '../hooks/useProjectsAnimation.js';
-// import './Projects.css';
+
+// import { useEffect, useState } from "react";
+// import { createPortal } from "react-dom";
+// import { projects as fallback } from "../data/site.js";
+// import Eyebrow from "./ui/Eyebrow.jsx";
+// import Icon from "./ui/Icon.jsx";
+// import useSplitText from "../hooks/useSplitText.js";
+// import useCursorFollower from "../hooks/useCursorFollower.js";
+// import useProjectsAnimation from "../hooks/useProjectsAnimation.js";
+// import "./Projects.css";
 
 // export default function Projects() {
 //   const [items, setItems] = useState(fallback.slice(0, 6));
+//   const apiBase = import.meta.env.VITE_API_URL || '';
 
 //   const heading = useSplitText();
 //   const { zone, dot } = useCursorFollower();
-//   const sectionRef = useProjectsAnimation([items]);
+//   const sectionRef = useProjectsAnimation([items.length]);
 
 //   useEffect(() => {
-//     fetch('/api/projects')
+//     fetch(`${apiBase}/api/projects`)
 //       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
 //       .then((d) => {
 //         if (Array.isArray(d) && d.length) {
@@ -23,7 +26,7 @@
 //         }
 //       })
 //       .catch(() => {});
-//   }, []);
+//   }, [apiBase]);
 
 //   return (
 //     <section id="projects" className="section shell" ref={sectionRef}>
@@ -39,7 +42,7 @@
 //             className="project"
 //             key={p.slug}
 //             style={{
-//               '--d': `${(i % 4) * 0.08}s`,
+//               "--d": `${(i % 4) * 0.08}s`,
 //             }}
 //           >
 //             <a
@@ -69,24 +72,18 @@
 //         ))}
 //       </div>
 
-//       <div
-//         className="projects__cursor"
-//         ref={dot}
-//         aria-hidden="true"
-//       >
-//         View
-//         <Icon
-//           name="arrow"
-//           size={12}
-//           stroke="#f7f7f6"
-//           width={2}
-//         />
-//       </div>
+//       {createPortal(
+//         <div className="projects__cursor" ref={dot} aria-hidden="true">
+//           <Icon name="arrow" size={22} stroke="#f7f7f6" width={2} />
+//         </div>,
+//         document.body
+//       )}
 //     </section>
 //   );
 // }
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { Link } from "react-router-dom";
 import { projects as fallback } from "../data/site.js";
 import Eyebrow from "./ui/Eyebrow.jsx";
 import Icon from "./ui/Icon.jsx";
@@ -131,9 +128,9 @@ export default function Projects() {
               "--d": `${(i % 4) * 0.08}s`,
             }}
           >
-            <a
+            <Link
               className="project__plate"
-              href={`#${p.slug}`}
+              to={`/projects/${p.slug}`}
               aria-label={p.name}
             >
               {p.image && (
@@ -143,7 +140,7 @@ export default function Projects() {
                   loading="lazy"
                 />
               )}
-            </a>
+            </Link>
 
             <div className="project__meta">
               <span>{p.name}</span>

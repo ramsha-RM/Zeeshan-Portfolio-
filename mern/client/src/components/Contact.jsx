@@ -48,9 +48,37 @@ export default function Contact() {
             {contact.lines[0]}<br />{contact.lines[1]}
           </p>
 
-          <div data-reveal className="contact__cta">
-            <PillButton ghost href="#">{contact.cta}</PillButton>
-          </div>
+          <form onSubmit={handleSubmit} data-reveal>
+            <div className="contact__formRow">
+              <input
+                type="text"
+                name="name"
+                placeholder="Your name"
+                value={form.name}
+                onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
+                required
+              />
+              <input
+                type="email"
+                name="email"
+                placeholder="Your email"
+                value={form.email}
+                onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))}
+                required
+              />
+            </div>
+            <textarea
+              name="message"
+              rows="5"
+              placeholder="Tell me about your project"
+              value={form.message}
+              onChange={(event) => setForm((current) => ({ ...current, message: event.target.value }))}
+            />
+            <div className="contact__formActions">
+              <button type="submit" className="contact__submit">{contact.cta}</button>
+              {status && <span className="contact__status">{status}</span>}
+            </div>
+          </form>
 
           <div className="contact__foot">
             <div className="contact__chip">{contact.footerChip}</div>

@@ -7,6 +7,7 @@ import cors from 'cors';
 import connectDB from './config/db.js';
 import projectRoutes from './routes/projects.js';
 import leadRoutes from './routes/leads.js';
+import uploadRoutes from './routes/uploads.js';
 import { notFound, errorHandler } from './middleware/errorHandler.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -29,11 +30,18 @@ app.use(cors({
 }));
 app.use(express.json());
 
-connectDB().catch(err => console.error("DB Connection Error:", err));
+const startDb = () =>
+  connectDB().catch(() => {
+    console.error('Retrying database connection in 15 seconds');
+    setTimeout(startDb, 15000);
+  });
+
+startDb();
 
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
 app.use('/api/projects', projectRoutes);
 app.use('/api/leads', leadRoutes);
+app.use('/api/uploads', uploadRoutes);
 
 if (existsSync(clientDistPath)) {
   app.use(express.static(clientDistPath));
