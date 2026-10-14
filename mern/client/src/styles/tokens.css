@@ -1,25 +1,44 @@
+@font-face {
+  font-family: 'Bayside';
+  src: url('/fonts/BaysideFont-Regular-Demo.otf') format('opentype');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Bayside Condensed';
+  src: url('/fonts/BaysideFont-Condensed-Demo.otf') format('opentype');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Photograph Signature';
+  src: url('/fonts/Photograph Signature.ttf') format('truetype');
+  font-display: swap;
+}
+
 :root {
   /* colour */
-  --bg: #f7f7f6;
+  --bg: #f6f4f1;
   --ink: #0c0d0e;
   --ink-2: #5a5c5e;
   --ink-3: #9a9c9e;
-  --line: #e3e3e1;
+  --line: rgba(12, 13, 14, 0.08);
   --white: #ffffff;
   --black: #0a0b0c;
   --black-2: #131415;
-  --accent: #c4cd1c;
+  --accent: #d2db7b;
   --plate: #ededeb;
   --dot: #e0663a;
-  --grad-top: #0e1012;
-  --grad-bot: #a9aaab;
+  --grad-top: #0a0b0c;
+  --grad-bot: #7a7d7f;
 
   /* type */
   --font-display: 'Anton', 'Arial Narrow', sans-serif;
-  --font-ui: 'Inter', system-ui, 'Helvetica Neue', sans-serif;
+  --font-display-condensed: 'Bayside Condensed', 'Arial Narrow', sans-serif;
+  --font-ui: 'Inter', 'Segoe UI', sans-serif;
   --font-geo: 'Jost', 'Futura', 'Century Gothic', sans-serif;
   --font-serif: 'Instrument Serif', Georgia, serif;
-  --font-script: 'Ms Madi', 'Sacramento', cursive;
+  --font-script: 'Photograph Signature', 'Segoe Print', cursive;
 
   /* layout + motion */
   --shell: clamp(1100px, 62vw, 1440px);

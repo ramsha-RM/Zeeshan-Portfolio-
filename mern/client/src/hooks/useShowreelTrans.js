@@ -66,6 +66,15 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
+/** localStorage can throw (privacy modes, blocked storage) — never let that break the page. */
+const readForceMotion = () => {
+  try {
+    return localStorage.getItem('forceMotion') === '1';
+  } catch {
+    return false;
+  }
+};
+
 export default function useShowreelTrans(gridRef, labelRef) {
   useLayoutEffect(() => {
     const grid = gridRef.current;
@@ -75,7 +84,7 @@ export default function useShowreelTrans(gridRef, labelRef) {
 
     const prefs = typeof window !== "undefined" ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
     const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
-    const forceMotion = params?.get("motion") === "on" || localStorage.getItem("forceMotion") === "1";
+    const forceMotion = params?.get("motion") === "on" || readForceMotion();
 
     const ctx = gsap.context(() => {
       const tiles = gsap.utils.toArray(grid.querySelectorAll(".reel__tile"));

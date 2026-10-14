@@ -94,11 +94,26 @@ link click, outside click and Escape. Markup: `components/Navbar.jsx`.
 | GET | `/api/health` | liveness |
 | GET | `/api/projects` | published case studies, ordered |
 | GET | `/api/projects/:slug` | one case study |
-| POST | `/api/projects` | create (add auth before shipping) |
+| POST | `/api/projects` | create (admin session required) |
 | POST | `/api/leads` | contact form submissions |
 
 `Projects.jsx` fetches `/api/projects` and silently falls back to the static list
 in `data/site.js`, so the front end runs with the API off.
+
+## Admin access
+
+Set `ADMIN_KEY` and `ADMIN_SESSION_SECRET` in `server/.env` (and in the
+production server's secret settings). Generate two independent random secrets
+with:
+
+    node -e "const c=require('crypto'); console.log('ADMIN_KEY='+c.randomBytes(32).toString('base64url')); console.log('ADMIN_SESSION_SECRET='+c.randomBytes(32).toString('base64url'))"
+
+Both values must be at least 32 characters. Do not commit `.env`, expose either
+value in client-side code, or reuse the same value for both settings. After
+sign-in, the server issues a 30-minute HttpOnly session cookie; the browser
+does not retain or resend the admin key. Production deployments must configure
+`CLIENT_ORIGINS` to the exact frontend origin(s), and the API must be served
+over HTTPS.
 
 ## Still to do
 
@@ -107,4 +122,3 @@ in `data/site.js`, so the front end runs with the API off.
 - Add the about portrait at `client/src/assets/portrait.jpg` and swap
   `.about__photoInner` for an `<img>`.
 - Wire the "Book a free intro call" button to `POST /api/leads`.
-- Add auth to `POST /api/projects`.

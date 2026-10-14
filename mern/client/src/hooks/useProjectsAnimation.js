@@ -4,6 +4,15 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
+/** localStorage can throw (privacy modes, blocked storage) — never let that break the page. */
+const readForceMotion = () => {
+  try {
+    return localStorage.getItem('forceMotion') === '1';
+  } catch {
+    return false;
+  }
+};
+
 export default function useProjectsAnimation(deps = []) {
   const sectionRef = useRef(null);
 
@@ -18,8 +27,7 @@ export default function useProjectsAnimation(deps = []) {
       
       const params = new URLSearchParams(window.location.search);
       const forceMotion =
-        params.get('motion') === 'on' ||
-        localStorage.getItem('forceMotion') === '1';
+        params.get('motion') === 'on' || readForceMotion();
 
       
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches && !forceMotion) {

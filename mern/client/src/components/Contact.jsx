@@ -1,35 +1,37 @@
 import { useState } from 'react';
 import { contact } from '../data/site.js';
 import Eyebrow from './ui/Eyebrow.jsx';
-import PillButton from './ui/PillButton.jsx';
 import SocialRow from './ui/SocialRow.jsx';
 import useSplitText from '../hooks/useSplitText.js';
+import { api } from '../lib/api.js';
 import './Contact.css';
+
+const EMPTY = { name: '', email: '', message: '', company: '' };
 
 export default function Contact() {
   const heading = useSplitText(0.06);
-  const [form, setForm] = useState({ name: '', email: '', message: '' });
-  const [status, setStatus] = useState('');
-  const apiBase = import.meta.env.VITE_API_URL || '';
+  const [form, setForm] = useState(EMPTY);
+  // status: idle | sending | success | error
+  const [state, setState] = useState({ status: 'idle', message: '' });
+  const sending = state.status === 'sending';
+
+  const field = (key) => (event) => {
+    setForm((current) => ({ ...current, [key]: event.target.value }));
+    if (state.status === 'error' || state.status === 'success') setState({ status: 'idle', message: '' });
+  };
 
   async function handleSubmit(event) {
     event.preventDefault();
-    setStatus('Sending...');
+    if (sending) return; // guard against double submits
+    setState({ status: 'sending', message: 'Sending…' });
 
     try {
-      const response = await fetch(`${apiBase}/api/leads`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      });
-
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.message || 'Unable to send message');
-
-      setForm({ name: '', email: '', message: '' });
-      setStatus('Thanks, I will be in touch.');
+      // credentials: 'omit' — the public form never needs the admin cookie.
+      await api('/api/leads', { method: 'POST', body: form, credentials: 'omit' });
+      setForm(EMPTY);
+      setState({ status: 'success', message: 'Thanks — your message is on its way. I’ll be in touch soon.' });
     } catch (error) {
-      setStatus(error.message);
+      setState({ status: 'error', message: error.message });
     }
   }
 
@@ -48,22 +50,28 @@ export default function Contact() {
             {contact.lines[0]}<br />{contact.lines[1]}
           </p>
 
-          <form onSubmit={handleSubmit} data-reveal>
+          <form className="contact__form" onSubmit={handleSubmit} aria-busy={sending} data-reveal>
             <div className="contact__formRow">
               <input
                 type="text"
                 name="name"
                 placeholder="Your name"
+                aria-label="Your name"
+                autoComplete="name"
+                maxLength={100}
                 value={form.name}
-                onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
+                onChange={field('name')}
                 required
               />
               <input
                 type="email"
                 name="email"
                 placeholder="Your email"
+                aria-label="Your email"
+                autoComplete="email"
+                maxLength={254}
                 value={form.email}
-                onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))}
+                onChange={field('email')}
                 required
               />
             </div>
@@ -71,12 +79,31 @@ export default function Contact() {
               name="message"
               rows="5"
               placeholder="Tell me about your project"
+              aria-label="Tell me about your project"
+              maxLength={2000}
               value={form.message}
-              onChange={(event) => setForm((current) => ({ ...current, message: event.target.value }))}
+              onChange={field('message')}
             />
+            {/* Honeypot: hidden from people and assistive tech; bots tend to fill it. */}
+            <div className="contact__hp" aria-hidden="true">
+              <label>
+                Company
+                <input type="text" name="company" tabIndex={-1} autoComplete="off" value={form.company} onChange={field('company')} />
+              </label>
+            </div>
             <div className="contact__formActions">
-              <button type="submit" className="contact__submit">{contact.cta}</button>
-              {status && <span className="contact__status">{status}</span>}
+              <button type="submit" className="contact__submit" disabled={sending}>
+                {sending ? 'Sending…' : contact.cta}
+              </button>
+              <span
+                className={`contact__status contact__status--${state.status}`}
+                role={state.status === 'error' ? 'alert' : 'status'}
+                aria-live="polite"
+              >
+                {state.status === 'success' && <span aria-hidden="true">✓ </span>}
+                {state.status === 'error' && <span aria-hidden="true">! </span>}
+                {state.status === 'sending' ? '' : state.message}
+              </span>
             </div>
           </form>
 

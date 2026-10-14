@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { signUpload } from '../controllers/uploadController.js';
-import { requireAdmin } from '../middleware/adminAuth.js';
+import { requireAdmin, requireTrustedOrigin } from '../middleware/adminAuth.js';
 
 const router = Router();
 
-router.post('/sign', requireAdmin, signUpload);
+router.post('/sign', requireTrustedOrigin, requireAdmin, signUpload);
 
 export default router;

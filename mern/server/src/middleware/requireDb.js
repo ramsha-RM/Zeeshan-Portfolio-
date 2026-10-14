@@ -1,6 +1,8 @@
-import mongoose from 'mongoose';
+import { waitForDb } from '../config/db.js';
 
-export const requireDb = (_req, res, next) => {
-  if (mongoose.connection.readyState === 1) return next();
-  res.status(503).json({ message: 'Database is not connected' });
+/** Rejects with 503 (instead of hanging or faking success) when MongoDB is unavailable. */
+export const requireDb = async (_req, res, next) => {
+  if (await waitForDb()) return next();
+  res.set('Retry-After', '30');
+  return res.status(503).json({ message: 'The database is temporarily unavailable. Please try again shortly.' });
 };

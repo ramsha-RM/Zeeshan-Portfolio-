@@ -9,7 +9,7 @@ import './Hero.css';
 
 function Stat({ value, suffix, label }) {
   const n = useCountUp(value);
-  return (
+  return ( 
     <div className="hero__stat">
       <div className="hero__statNum">{n}{suffix}</div>
       <div className="hero__statLabel">{label}</div>

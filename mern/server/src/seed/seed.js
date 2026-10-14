@@ -91,27 +91,31 @@ const projects = [
     order: 6,
   },
 ];
-await connectDB();
+const uri = process.env.MONGO_URI || '';
+const isLocal = !uri || /^mongodb:\/\/(localhost|127\.0\.0\.1)(:\d+)?\//.test(uri);
+const confirmed = process.argv.includes('--yes') || process.env.SEED_CONFIRM === 'yes';
 
-await Project.deleteMany({});
-await Project.insertMany(projects);
+if (!isLocal && !confirmed) {
+  console.error(
+    'Refusing to seed: MONGO_URI points to a remote database and seeding DELETES every project first.\n' +
+      'If you really mean it, run:  npm run seed -- --yes'
+  );
+  process.exit(1);
+}
 
-console.log('Seeded ' + projects.length + ' projects');
+try {
+  await connectDB();
 
-console.log('Database:', mongoose.connection.name);
-console.log('Collection:', Project.collection.name);
-console.log('Count:', await Project.countDocuments());
+  await Project.deleteMany({});
+  await Project.insertMany(projects);
 
-await mongoose.disconnect();
-// try {
-//   await connectDB();
-
-//   await Project.deleteMany({});
-//   await Project.insertMany(projects);
-
-//   console.log(`Seeded ${projects.length} projects`);
-// } catch (error) {
-//   console.error('Seed error:', error);
-// } finally {
-//   await mongoose.disconnect();
-// }
+  console.log('Seeded ' + projects.length + ' projects');
+  console.log('Database:', mongoose.connection.name);
+  console.log('Collection:', Project.collection.name);
+  console.log('Count:', await Project.countDocuments());
+} catch (error) {
+  console.error('Seed error:', error.message);
+  process.exitCode = 1;
+} finally {
+  await mongoose.disconnect();
+}

@@ -1,8 +1,14 @@
-import { useCallback, useEffect, useState } from 'react';
-import { api, uploadImage } from '../lib/api.js';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import Navbar from '../components/Navbar.jsx';
+import Contact from '../components/Contact.jsx';
+import ProjectCaseStudy from '../components/project-details/ProjectCaseStudy.jsx';
+import { EditableImage, EditableText } from '../components/project-details/InlineEdit.jsx';
+import { api } from '../lib/api.js';
+import useReveal from '../hooks/useReveal.js';
+import '../components/project-details/ProjectDetails.css';
 import './Admin.css';
 
-const blank = () => ({
+const blankProject = () => ({
   name: '',
   slug: '',
   tags: [],
@@ -28,430 +34,380 @@ const blank = () => ({
   }
 });
 
-const normalise = (p) => {
-  const b = blank();
-  const d = p.details || {};
+const withDefaults = (project) => {
+  const blank = blankProject();
+  const details = project.details || {};
   return {
-    ...b,
-    ...p,
+    ...blank,
+    ...project,
+    tags: project.tags || [],
     details: {
-      ...b.details,
-      ...d,
-      intro: { ...b.details.intro, ...d.intro },
-      highlights: { ...b.details.highlights, ...d.highlights },
-      screens: { ...b.details.screens, ...d.screens }
+      ...blank.details,
+      ...details,
+      intro: {
+        ...blank.details.intro,
+        ...details.intro,
+        paragraphs: details.intro?.paragraphs || []
+      },
+      colors: details.colors || [],
+      fonts: details.fonts || [],
+      sections: details.sections || [],
+      highlights: {
+        ...blank.details.highlights,
+        ...details.highlights,
+        items: details.highlights?.items || []
+      },
+      screens: { ...blank.details.screens, ...details.screens }
     }
   };
 };
 
-const getIn = (obj, path) => path.split('.').reduce((o, k) => (o == null ? undefined : o[k]), obj);
-
-const setIn = (obj, path, value) => {
-  const keys = path.split('.');
-  const root = Array.isArray(obj) ? [...obj] : { ...obj };
-  let cur = root;
-  keys.forEach((k, i) => {
-    if (i === keys.length - 1) {
-      cur[k] = value;
-    } else {
-      cur[k] = Array.isArray(cur[k]) ? [...cur[k]] : { ...cur[k] };
-      cur = cur[k];
-    }
-  });
-  return root;
+const setPath = (source, path, value) => {
+  const [key, ...rest] = path.split('.');
+  const copy = Array.isArray(source) ? [...source] : { ...source };
+  if (!rest.length) {
+    copy[key] = value;
+    return copy;
+  }
+  copy[key] = setPath(source?.[key] ?? (Array.isArray(source) ? [] : {}), rest.join('.'), value);
+  return copy;
 };
 
-const prepare = (form) => ({
-  ...form,
-  order: Number(form.order) || 0,
-  tags: form.tags.map((t) => t.trim()).filter(Boolean),
-  details: {
-    ...form.details,
-    intro: {
-      ...form.details.intro,
-      paragraphs: form.details.intro.paragraphs.map((t) => t.trim()).filter(Boolean)
-    }
+const changeAt = (project, path, value) => {
+  const next = setPath(project, path, value);
+  if (path === 'details.title' && (!project.name || project.name === project.details.title)) {
+    next.name = value;
   }
-});
+  return next;
+};
 
-function Field({ label, wide, children }) {
-  return (
-    <label className={'adm__field' + (wide ? ' adm__field--wide' : '')}>
-      <span>{label}</span>
-      {children}
-    </label>
-  );
-}
+const updateListAt = (project, path, transform) => {
+  const current = path.split('.').reduce((value, key) => value?.[key], project);
+  return setPath(project, path, transform(Array.isArray(current) ? current : []));
+};
 
-function Text({ form, set, path, label, wide, area }) {
-  const Tag = area ? 'textarea' : 'input';
-  return (
-    <Field label={label} wide={wide}>
-      <Tag
-        rows={area ? 4 : undefined}
-        value={getIn(form, path) ?? ''}
-        onChange={(e) => set(path, e.target.value)}
-      />
-    </Field>
-  );
-}
-
-function ImageField({ form, set, path, label, adminKey }) {
+function AdminGate({ onSubmit, error }) {
+  const [key, setKey] = useState('');
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
-  const value = getIn(form, path) || '';
 
-  async function pick(e) {
-    const file = e.target.files && e.target.files[0];
-    if (!file) return;
+  async function submit(event) {
+    event.preventDefault();
     setBusy(true);
-    setError('');
     try {
-      set(path, await uploadImage(file, adminKey));
-    } catch (err) {
-      setError(err.message);
+      await onSubmit(key);
     } finally {
       setBusy(false);
-      e.target.value = '';
     }
   }
 
   return (
-    <div className="adm__field adm__field--wide adm__image">
-      <span>{label}</span>
-      <div className="adm__imageRow">
-        <div className="adm__thumb">{value && <img src={value} alt="" />}</div>
-        <div className="adm__imageCtl">
-          <input
-            placeholder="Image URL"
-            value={value}
-            onChange={(e) => set(path, e.target.value)}
-          />
-          <div className="adm__imageBtns">
-            <label className="adm__btn adm__btn--ghost">
-              {busy ? 'Uploading…' : 'Upload image'}
-              <input type="file" accept="image/*" onChange={pick} disabled={busy} hidden />
-            </label>
-            {value && (
-              <button type="button" className="adm__btn adm__btn--ghost" onClick={() => set(path, '')}>
-                Remove
-              </button>
-            )}
-          </div>
-          {error && <small className="adm__error">{error}</small>}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ListHead({ title, onAdd, addLabel }) {
-  return (
-    <div className="adm__listHead">
-      <h4>{title}</h4>
-      <button type="button" className="adm__btn adm__btn--ghost" onClick={onAdd}>
-        {addLabel}
-      </button>
-    </div>
-  );
-}
-
-function RowTools({ index, count, onMove, onRemove }) {
-  return (
-    <div className="adm__rowTools">
-      <button type="button" disabled={index === 0} onClick={() => onMove(index, -1)}>↑</button>
-      <button type="button" disabled={index === count - 1} onClick={() => onMove(index, 1)}>↓</button>
-      <button type="button" onClick={() => onRemove(index)}>Delete</button>
-    </div>
-  );
-}
-
-function Gate({ onSubmit, error }) {
-  const [value, setValue] = useState('');
-  return (
     <div className="adm adm--gate">
-      <form
-        className="adm__gate"
-        onSubmit={(e) => {
-          e.preventDefault();
-          onSubmit(value);
-        }}
-      >
+      <form className="adm__gate" onSubmit={submit}>
         <h1>Admin</h1>
+        <p>Sign in to edit the project case studies.</p>
+        <label htmlFor="admin-key" className="adm__label">Admin key</label>
         <input
+          id="admin-key"
           type="password"
-          placeholder="Admin key"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
+          autoComplete="current-password"
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? 'admin-key-error' : undefined}
           autoFocus
+          required
+          value={key}
+          onChange={(event) => setKey(event.target.value)}
+          placeholder="Admin key"
         />
-        <button type="submit" className="adm__btn">Sign in</button>
-        {error && <small className="adm__error">{error}</small>}
+        <button type="submit" className="adm__btn" disabled={busy}>
+          {busy ? 'Signing in…' : 'Sign in'}
+        </button>
+        {error && <small id="admin-key-error" className="adm__error" role="alert">{error}</small>}
       </form>
     </div>
   );
 }
 
+function ProjectSettings({ project, update }) {
+  return (
+    <div className="pd__adminSettings shell">
+      <label className="pd__adminSetting">
+        <span>Project URL</span>
+        <EditableText
+          value={project.slug}
+          placeholder="project-url"
+          onChange={(value) => update('slug', value)}
+        />
+      </label>
+      <label className="pd__adminSetting pd__adminSetting--tags">
+        <span>Project tags</span>
+        <input
+          value={(project.tags || []).join(', ')}
+          placeholder="Design, Web, Mobile"
+          onChange={(event) => update('tags', event.target.value.split(',').map((tag) => tag.trim()).filter(Boolean))}
+        />
+      </label>
+      <label className="pd__adminSetting">
+        <span>Project order</span>
+        <input
+          type="number"
+          value={project.order || 0}
+          onChange={(event) => update('order', Number(event.target.value))}
+        />
+      </label>
+      <div className="pd__adminSetting pd__adminSetting--cover">
+        <span>Portfolio card image</span>
+        <EditableImage
+          src={project.image}
+          alt={`${project.name || 'Project'} portfolio card`}
+          onChange={(value) => update('image', value)}
+          emptyLabel="Add card image"
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function Admin() {
-  const [adminKey, setAdminKey] = useState('');
-  const [authed, setAuthed] = useState(false);
-  const [gateError, setGateError] = useState('');
+  const [authChecked, setAuthChecked] = useState(false);
+  const [authenticated, setAuthenticated] = useState(false);
+  const [authError, setAuthError] = useState('');
   const [projects, setProjects] = useState([]);
-  const [form, setForm] = useState(null);
-  const [status, setStatus] = useState('');
+  const [project, setProject] = useState(null);
+  const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [status, setStatus] = useState('');
 
-  const load = useCallback(
-    async (key) => {
-      const list = await api('/api/projects/admin/all', { adminKey: key });
-      setProjects(list);
-      return list;
-    },
-    []
-  );
+  useReveal([
+    authenticated,
+    project?._id,
+    project?.details.sections.length,
+    project?.details.intro.paragraphs.length,
+    project?.details.colors.length,
+    project?.details.fonts.length,
+    project?.details.highlights.items.length
+  ]);
 
-  const signIn = useCallback(
-    async (key) => {
-      setGateError('');
-      try {
-        await load(key);
-        setAdminKey(key);
-        setAuthed(true);
-      } catch (err) {
-        setGateError(err.message);
+  useEffect(() => {
+    if (!dirty) return undefined;
+    const warn = (event) => {
+      event.preventDefault();
+      event.returnValue = '';
+    };
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [dirty]);
+
+  // Ctrl/Cmd+S saves, so saving isn't hidden behind the "More" menu.
+  const saveRef = useRef(null);
+  useEffect(() => {
+    const onKey = (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
+        event.preventDefault();
+        saveRef.current?.();
       }
-    },
-    [load]
-  );
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
-  const set = (path, value) => setForm((f) => setIn(f, path, value));
+  const loadProjects = useCallback(async () => {
+    const list = await api('/api/projects/admin/all');
+    const normalized = list.map(withDefaults);
+    setProjects(normalized);
+    return normalized;
+  }, []);
 
-  const addTo = (path, item) => set(path, [...getIn(form, path), item]);
-  const removeAt = (path, i) => set(path, getIn(form, path).filter((_, n) => n !== i));
-  const move = (path, i, dir) => {
-    const list = [...getIn(form, path)];
-    const j = i + dir;
-    if (j < 0 || j >= list.length) return;
-    [list[i], list[j]] = [list[j], list[i]];
-    set(path, list);
+  useEffect(() => {
+    let active = true;
+    api('/api/admin/me')
+      .then(async ({ authenticated: hasSession }) => {
+        if (!active || !hasSession) return;
+        setAuthenticated(true);
+        try {
+          const list = await loadProjects();
+          if (active) setProject(list[0] || blankProject());
+        } catch (error) {
+          if (active) setStatus(`Admin session is active, but projects could not be loaded: ${error.message}`);
+        }
+      })
+      .catch((error) => {
+        if (active) setAuthError(error.message);
+      })
+      .finally(() => {
+        if (active) setAuthChecked(true);
+      });
+    return () => {
+      active = false;
+    };
+  }, [loadProjects]);
+
+  const signIn = async (key) => {
+    setAuthError('');
+    try {
+      await api('/api/admin/login', { method: 'POST', body: { passkey: key } });
+      setAuthenticated(true);
+      setStatus('');
+      try {
+        const list = await loadProjects();
+        setProject(list[0] || blankProject());
+      } catch (error) {
+        setProject(blankProject());
+        setStatus(`Signed in, but projects could not be loaded: ${error.message}`);
+      }
+    } catch (error) {
+      setAuthError(error.message);
+    }
   };
 
-  async function save() {
-    if (!form.name.trim()) {
-      setStatus('Name is required');
+  const update = (path, value) => {
+    setProject((current) => changeAt(current, path, value));
+    setDirty(true);
+  };
+
+  const add = (path, item) => {
+    setProject((current) => updateListAt(current, path, (list) => [...list, item]));
+    setDirty(true);
+  };
+
+  const remove = (path, index) => {
+    setProject((current) => updateListAt(current, path, (list) => list.filter((_, itemIndex) => itemIndex !== index)));
+    setDirty(true);
+  };
+
+  const selectProject = (id) => {
+    if (dirty && !window.confirm('Discard unsaved edits and switch projects?')) return;
+    setProject(projects.find((item) => item._id === id) || blankProject());
+    setDirty(false);
+    setStatus('');
+  };
+
+  const addProject = () => {
+    if (dirty && !window.confirm('Discard unsaved edits and create a new project?')) return;
+    setProject(blankProject());
+    setDirty(true);
+    setStatus('New draft. Fill in the title and content, then choose Save changes in More.');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const saveProject = async () => {
+    if (!project) return;
+    const name = String(project.name || project.details.title || '').trim();
+    if (!name) {
+      setStatus('Add a project title before saving.');
       return;
     }
     setSaving(true);
     setStatus('');
+    const payload = {
+      ...project,
+      name,
+      slug: project.slug || name,
+      details: project.details
+    };
     try {
-      const payload = prepare(form);
-      const saved = form._id
-        ? await api(`/api/projects/${form._id}`, { method: 'PUT', body: payload, adminKey })
-        : await api('/api/projects', { method: 'POST', body: payload, adminKey });
-      setForm(normalise(saved));
-      await load(adminKey);
-      setStatus('Saved');
-    } catch (err) {
-      setStatus(err.message);
+      const saved = project._id
+        ? await api(`/api/projects/${encodeURIComponent(project._id)}`, { method: 'PUT', body: payload })
+        : await api('/api/projects', { method: 'POST', body: payload });
+      const next = withDefaults(saved);
+      const list = await loadProjects();
+      setProject(next);
+      setProjects(list);
+      setDirty(false);
+      setStatus('Project saved.');
+    } catch (error) {
+      setStatus(error.message);
+      if (error.status === 401) setAuthenticated(false);
     } finally {
       setSaving(false);
     }
-  }
+  };
 
-  async function remove() {
-    if (!form._id || !window.confirm(`Delete "${form.name}"? This cannot be undone.`)) return;
-    try {
-      await api(`/api/projects/${form._id}`, { method: 'DELETE', adminKey });
-      setForm(null);
-      await load(adminKey);
-    } catch (err) {
-      setStatus(err.message);
+  saveRef.current = dirty && !saving ? saveProject : null;
+
+  const togglePublished = () => {
+    if (!project) return;
+    update('published', !project.published);
+  };
+
+  const deleteProject = async () => {
+    if (!project?._id) {
+      setProject(blankProject());
+      setDirty(false);
+      setStatus('Unsaved draft discarded.');
+      return;
     }
+    if (!window.confirm(`Delete “${project.name}”? This cannot be undone.`)) return;
+    try {
+      await api(`/api/projects/${encodeURIComponent(project._id)}`, { method: 'DELETE' });
+      const list = (await loadProjects()).filter((item) => item._id !== project._id);
+      setProjects(list);
+      setProject(list[0] || blankProject());
+      setDirty(false);
+      setStatus('Project deleted.');
+    } catch (error) {
+      setStatus(error.message);
+      if (error.status === 401) setAuthenticated(false);
+    }
+  };
+
+  const signOut = async () => {
+    try {
+      await api('/api/admin/logout', { method: 'POST' });
+      setAuthenticated(false);
+      setProject(null);
+      setProjects([]);
+      setDirty(false);
+      setAuthError('');
+    } catch (error) {
+      setStatus(`Could not sign out: ${error.message}`);
+    }
+  };
+
+  if (!authChecked) {
+    return <div className="adm adm--gate"><p>Checking admin session…</p></div>;
   }
-
-  function signOut() {
-    setAdminKey('');
-    setAuthed(false);
-    setForm(null);
-  }
-
-  if (!authed) return <Gate onSubmit={signIn} error={gateError} />;
-
-  const img = { form, set, adminKey };
-  const sections = form ? form.details.sections : [];
+  if (!authenticated) return <AdminGate onSubmit={signIn} error={authError} />;
 
   return (
-    <div className="adm">
-      <aside className="adm__side">
-        <div className="adm__sideHead">
-          <h1>Projects</h1>
-          <button type="button" className="adm__btn" onClick={() => { setForm(blank()); setStatus(''); }}>
-            New project
-          </button>
-        </div>
-
-        <ul>
-          {projects.map((p) => (
-            <li key={p._id}>
-              <button
-                type="button"
-                className={form && form._id === p._id ? 'is-active' : ''}
-                onClick={() => { setForm(normalise(p)); setStatus(''); }}
-              >
-                <span>{p.name}</span>
-                <small>{p.published ? 'Live' : 'Draft'}</small>
-              </button>
-            </li>
-          ))}
-        </ul>
-
-        <button type="button" className="adm__btn adm__btn--ghost" onClick={signOut}>
-          Sign out
-        </button>
-      </aside>
-
-      <section className="adm__main">
-        {!form && <p className="adm__empty">Select a project or create a new one.</p>}
-
-        {form && (
+    <>
+      <Navbar
+        adminTools
+        projects={projects}
+        selectedProjectId={project?._id}
+        published={Boolean(project?.published)}
+        dirty={dirty}
+        saving={saving}
+        onAddProject={addProject}
+        onSelectProject={selectProject}
+        onSaveProject={saveProject}
+        onDeleteProject={deleteProject}
+        onTogglePublish={togglePublished}
+        onSignOut={signOut}
+      />
+      <main className="pd pd--editable">
+        {status && <p className="pd__adminStatus shell" role="status">{status}</p>}
+        {dirty && (
+          <div className="pd__adminSaveBar shell">
+            <span>Unsaved changes</span>
+            <button type="button" className="adm__btn" onClick={saveProject} disabled={saving}>
+              {saving ? 'Saving…' : 'Save changes'}
+            </button>
+          </div>
+        )}
+        {project && (
           <>
-            <div className="adm__bar">
-              <h2>{form.name || 'New project'}</h2>
-              <div className="adm__barBtns">
-                {form._id && form.published && (
-                  <a className="adm__btn adm__btn--ghost" href={`/projects/${form.slug}`} target="_blank" rel="noreferrer">
-                    View page
-                  </a>
-                )}
-                {form._id && (
-                  <button type="button" className="adm__btn adm__btn--ghost" onClick={remove}>Delete</button>
-                )}
-                <button type="button" className="adm__btn" onClick={save} disabled={saving}>
-                  {saving ? 'Saving…' : 'Save'}
-                </button>
-              </div>
-            </div>
-            {status && <p className="adm__status">{status}</p>}
-
-            <fieldset className="adm__group">
-              <legend>Card on the home page</legend>
-              <Text form={form} set={set} path="name" label="Name" />
-              <Text form={form} set={set} path="slug" label="Slug (URL)" />
-              <Field label="Tags (comma separated)">
-                <input
-                  value={form.tags.join(', ')}
-                  onChange={(e) => set('tags', e.target.value.split(/,\s*/))}
-                />
-              </Field>
-              <Text form={form} set={set} path="order" label="Order" />
-              <Field label="Published">
-                <input type="checkbox" checked={form.published} onChange={(e) => set('published', e.target.checked)} />
-              </Field>
-              <ImageField {...img} path="image" label="Card image" />
-            </fieldset>
-
-            <fieldset className="adm__group">
-              <legend>Hero</legend>
-              <Text form={form} set={set} path="details.eyebrow" label="Script line" />
-              <Text form={form} set={set} path="details.title" label="Big title" />
-              <Text form={form} set={set} path="details.role" label="Role" />
-              <Text form={form} set={set} path="details.client" label="Client" />
-              <Text form={form} set={set} path="details.discipline" label="Discipline" />
-              <Text form={form} set={set} path="details.year" label="Year" />
-              <Text form={form} set={set} path="details.heroLabel" label="Label on image" />
-              <Text form={form} set={set} path="details.heroCaption" label="Caption on image" />
-              <ImageField {...img} path="details.heroImage" label="Hero image" />
-            </fieldset>
-
-            <fieldset className="adm__group">
-              <legend>Challenge</legend>
-              <Text form={form} set={set} path="details.intro.eyebrow" label="Script line" />
-              <Text form={form} set={set} path="details.intro.heading" label="Heading" />
-              <Field label="Paragraphs (blank line between)" wide>
-                <textarea
-                  rows={7}
-                  value={form.details.intro.paragraphs.join('\n\n')}
-                  onChange={(e) => set('details.intro.paragraphs', e.target.value.split(/\n{2,}/))}
-                />
-              </Field>
-              <ImageField {...img} path="details.intro.image" label="Overview image" />
-            </fieldset>
-
-            <fieldset className="adm__group adm__group--list">
-              <legend>Colors and fonts</legend>
-              <ListHead title="Colors" addLabel="Add color" onAdd={() => addTo('details.colors', { name: '', hex: '#000000' })} />
-              {form.details.colors.map((c, i) => (
-                <div className="adm__item" key={i}>
-                  <Text form={form} set={set} path={`details.colors.${i}.name`} label="Name" />
-                  <Field label="Color">
-                    <input type="color" value={c.hex} onChange={(e) => set(`details.colors.${i}.hex`, e.target.value)} />
-                  </Field>
-                  <RowTools index={i} count={form.details.colors.length} onMove={(n, d) => move('details.colors', n, d)} onRemove={(n) => removeAt('details.colors', n)} />
-                </div>
-              ))}
-
-              <ListHead title="Fonts" addLabel="Add font" onAdd={() => addTo('details.fonts', { name: '', sample: 'Aa' })} />
-              {form.details.fonts.map((f, i) => (
-                <div className="adm__item" key={i}>
-                  <Text form={form} set={set} path={`details.fonts.${i}.name`} label="Font name" />
-                  <Text form={form} set={set} path={`details.fonts.${i}.sample`} label="Sample" />
-                  <RowTools index={i} count={form.details.fonts.length} onMove={(n, d) => move('details.fonts', n, d)} onRemove={(n) => removeAt('details.fonts', n)} />
-                </div>
-              ))}
-            </fieldset>
-
-            <fieldset className="adm__group adm__group--list">
-              <legend>Text and image sections</legend>
-              <ListHead
-                title={`${sections.length} sections`}
-                addLabel="Add section"
-                onAdd={() => addTo('details.sections', { eyebrow: 'The Challenge', heading: '', body: '', image: '', caption: '', captionRight: '', side: 'auto' })}
-              />
-              {sections.map((s, i) => (
-                <div className="adm__card" key={i}>
-                  <Text form={form} set={set} path={`details.sections.${i}.eyebrow`} label="Script line" />
-                  <Text form={form} set={set} path={`details.sections.${i}.heading`} label="Heading" />
-                  <Text form={form} set={set} path={`details.sections.${i}.body`} label="Text" wide area />
-                  <Text form={form} set={set} path={`details.sections.${i}.caption`} label="Caption left" />
-                  <Text form={form} set={set} path={`details.sections.${i}.captionRight`} label="Caption right" />
-                  <Field label="Image side">
-                    <select value={s.side} onChange={(e) => set(`details.sections.${i}.side`, e.target.value)}>
-                      <option value="auto">Alternate</option>
-                      <option value="right">Right</option>
-                      <option value="left">Left</option>
-                    </select>
-                  </Field>
-                  <ImageField {...img} path={`details.sections.${i}.image`} label="Image" />
-                  <RowTools index={i} count={sections.length} onMove={(n, d) => move('details.sections', n, d)} onRemove={(n) => removeAt('details.sections', n)} />
-                </div>
-              ))}
-            </fieldset>
-
-            <fieldset className="adm__group adm__group--list">
-              <legend>Dark highlights block</legend>
-              <Text form={form} set={set} path="details.highlights.eyebrow" label="Script line" />
-              <Text form={form} set={set} path="details.highlights.heading" label="Heading" />
-              <ListHead title="Points (numbered automatically)" addLabel="Add point" onAdd={() => addTo('details.highlights.items', { title: '', body: '' })} />
-              {form.details.highlights.items.map((it, i) => (
-                <div className="adm__card" key={i}>
-                  <Text form={form} set={set} path={`details.highlights.items.${i}.title`} label="Title" />
-                  <Text form={form} set={set} path={`details.highlights.items.${i}.body`} label="Text" wide area />
-                  <RowTools index={i} count={form.details.highlights.items.length} onMove={(n, d) => move('details.highlights.items', n, d)} onRemove={(n) => removeAt('details.highlights.items', n)} />
-                </div>
-              ))}
-            </fieldset>
-
-            <fieldset className="adm__group">
-              <legend>Screens</legend>
-              <Text form={form} set={set} path="details.screens.eyebrow" label="Script line" />
-              <Text form={form} set={set} path="details.screens.heading" label="Heading" />
-              <ImageField {...img} path="details.screens.desktop" label="Desktop screen" />
-              <ImageField {...img} path="details.screens.mobile" label="Mobile screen" />
-              <ImageField {...img} path="details.screens.thankYou" label="Thank you card" />
-            </fieldset>
+            <ProjectSettings project={project} update={update} />
+            <ProjectCaseStudy
+              project={project}
+              editable
+              update={update}
+              add={add}
+              remove={remove}
+            />
           </>
         )}
-      </section>
-    </div>
+      </main>
+      <Contact />
+    </>
   );
 }

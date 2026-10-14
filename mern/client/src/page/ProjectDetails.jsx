@@ -2,17 +2,17 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
 import Contact from '../components/Contact.jsx';
-import ProjectHero from '../components/project-details/ProjectHero.jsx';
-import ProjectIntro from '../components/project-details/ProjectIntro.jsx';
-import ProjectSections from '../components/project-details/ProjectSections.jsx';
-import ProjectHighlights from '../components/project-details/ProjectHighlights.jsx';
-import ProjectScreens from '../components/project-details/ProjectScreens.jsx';
+import ProjectCaseStudy from '../components/project-details/ProjectCaseStudy.jsx';
 import useReveal from '../hooks/useReveal.js';
 import { api } from '../lib/api.js';
 import '../components/project-details/ProjectDetails.css';
 
 const withDefaults = (p) => {
   const d = p.details || {};
+  const intro = { eyebrow: '', heading: '', paragraphs: [], image: '', ...d.intro };
+  const highlights = { eyebrow: '', heading: '', items: [], ...d.highlights };
+  intro.paragraphs = d.intro?.paragraphs || [];
+  highlights.items = d.highlights?.items || [];
   return {
     ...p,
     details: {
@@ -25,12 +25,12 @@ const withDefaults = (p) => {
       heroImage: '',
       heroLabel: '',
       heroCaption: '',
-      colors: [],
-      fonts: [],
-      sections: [],
       ...d,
-      intro: { eyebrow: '', heading: '', paragraphs: [], image: '', ...d.intro },
-      highlights: { eyebrow: '', heading: '', items: [], ...d.highlights },
+      colors: d.colors || [],
+      fonts: d.fonts || [],
+      sections: d.sections || [],
+      intro,
+      highlights,
       screens: { eyebrow: '', heading: '', desktop: '', mobile: '', thankYou: '', ...d.screens }
     }
   };
@@ -70,13 +70,7 @@ export default function ProjectDetails() {
 
       <main className="pd">
         {state.status === 'ready' && (
-          <>
-            <ProjectHero project={state.project} />
-            <ProjectIntro project={state.project} />
-            <ProjectSections project={state.project} />
-            <ProjectHighlights project={state.project} />
-            <ProjectScreens project={state.project} />
-          </>
+          <ProjectCaseStudy project={state.project} />
         )}
 
         {state.status === 'loading' && <p className="pd__state">Loading project…</p>}

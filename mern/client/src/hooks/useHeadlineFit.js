@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 
 /**
  * Measures the headline on an off-screen probe and sets font-size so the line
- * fills `fill`% of the content column on desktop (99.5% under 900px). Never wraps.
+ * fills `fill`% of the content column at every viewport width. Never wraps.
  * The script line above it stays at 60% of the resolved size.
  */
 export default function useHeadlineFit(fill = 78) {
@@ -29,8 +29,7 @@ export default function useHeadlineFit(fill = 78) {
       const w = probe.getBoundingClientRect().width;
       probe.remove();
       if (!w || !avail) return;
-      const size =
-        200 * ((avail * (innerWidth < 900 ? 0.995 : fill / 100)) / w);
+      const size = 200 * ((avail * (fill / 100)) / w);
       h.style.fontSize = size.toFixed(2) + "px";
       if (script.current)
         script.current.style.fontSize = (size * 0.6).toFixed(2) + "px";

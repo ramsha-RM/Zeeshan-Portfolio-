@@ -11,8 +11,10 @@ export default function useTransition(heroRef, showreelRef) {
 
     if (!hero || !showreel) return;
 
+    let ctx = null;
+
     const run = () => {
-      const ctx = gsap.context(() => {
+      ctx = gsap.context(() => {
         gsap.fromTo(
           showreel,
           {
@@ -32,11 +34,13 @@ export default function useTransition(heroRef, showreelRef) {
           }
         );
       }, showreel);
-
-      return () => ctx.revert();
     };
 
     const rafId = requestAnimationFrame(run);
-    return () => cancelAnimationFrame(rafId);
+  
+    return () => {
+      cancelAnimationFrame(rafId);
+      ctx?.revert();
+    };
   }, [heroRef, showreelRef]);
 }

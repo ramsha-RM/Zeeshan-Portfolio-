@@ -31,6 +31,7 @@
     grid-template-columns: 1fr;
   } }  */
 
+
 .projects {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -72,7 +73,7 @@
 .project__tags {
   display: flex;
   gap: 18px;
-  color: var(--ink-3);
+  color: var(--ink-tag, #6b6d70); /* was --ink-3: 2.5:1 contrast, below WCAG AA */
   transition: color 0.5s var(--ease);
 }
 .project:hover .project__tags {
