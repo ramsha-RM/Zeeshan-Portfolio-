@@ -9,6 +9,7 @@ import {
 } from '../controllers/projectController.js';
 import { requireAdmin, requireTrustedOrigin } from '../middleware/adminAuth.js';
 import { requireDb } from '../middleware/requireDb.js';
+import { streamProjectEvents } from '../projectEvents.js';
 
 const router = Router();
 
@@ -22,6 +23,7 @@ router.use((req, res, next) => {
 });
 
 router.get('/', listProjects);
+router.get('/events', streamProjectEvents);
 router.get('/admin/all', requireDb, listAllProjects);
 router.get('/:slug', getProject);
 router.post('/', requireDb, createProject);

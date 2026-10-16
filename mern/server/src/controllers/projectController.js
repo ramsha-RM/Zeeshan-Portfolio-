@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { isDbConnected } from '../config/db.js';
 import Project from '../models/Project.js';
 import { isAdmin } from '../middleware/adminAuth.js';
+import { publishProjectChange } from '../projectEvents.js';
 
 const fallbackProjects = [
   {
@@ -223,6 +224,7 @@ export const createProject = async (req, res) => {
       body.order = (await Project.countDocuments()) + 1;
     }
     const project = await Project.create(body);
+    publishProjectChange();
     return res.status(201).json(project);
   } catch (err) {
     return sendError(res, err, 'Create project error:');
@@ -243,6 +245,7 @@ export const updateProject = async (req, res) => {
 
     project.set(changes);
     await project.save();
+    publishProjectChange();
     return res.json(project);
   } catch (err) {
     return sendError(res, err, 'Update project error:');
@@ -260,6 +263,7 @@ export const deleteProject = async (req, res) => {
       return res.status(404).json({ message: 'Project not found' });
     }
 
+    publishProjectChange();
     return res.json({ ok: true });
   } catch (err) {
     return sendError(res, err, 'Delete project error:');

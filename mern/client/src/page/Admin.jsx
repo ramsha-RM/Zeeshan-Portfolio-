@@ -826,7 +826,7 @@ export default function Admin() {
         {status && <p className="pd__adminStatus shell" role="status">{status}</p>}
         {dirty && (
           <div className="pd__adminSaveBar shell">
-            <span>Unsaved changes</span>
+            {/* <span>Unsaved changes</span> */}
             <button type="button" className="adm__btn" onClick={saveProject} disabled={saving}>
               {saving ? 'Saving…' : 'Save changes'}
             </button>
