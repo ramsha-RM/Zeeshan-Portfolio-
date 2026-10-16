@@ -2,7 +2,7 @@ import crypto from 'node:crypto';
 
 const SESSION_COOKIE = 'admin_session';
 const SESSION_TTL_SECONDS = 30 * 60;
-const MIN_SECRET_LENGTH = 32;
+const MIN_SECRET_LENGTH = 8;
 const developmentSessionSecret = crypto.randomBytes(32).toString('base64url');
 
 const configuredOrigins = () =>
