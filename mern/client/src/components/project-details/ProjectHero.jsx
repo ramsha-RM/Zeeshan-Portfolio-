@@ -18,8 +18,8 @@ export default function ProjectHero({ project, editable = false, update }) {
   return (
     <section className="pd__hero shell">
       <div className="pd__titleWrap" data-reveal>
-        <Text path="details.eyebrow" value={d.eyebrow} className="pd__script" placeholder="Selected Project" />
-        <Text as="h1" path="details.title" value={d.title} className="pd__title" placeholder="Project title" />
+        <span className="pd__script">Selected Project</span>
+        <h1 className="pd__title">Project Case Study</h1>
       </div>
 
       {meta.length > 0 && (editable || hasImage) && (

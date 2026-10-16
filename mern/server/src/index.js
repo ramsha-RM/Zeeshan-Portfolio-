@@ -17,6 +17,7 @@ const __dirname = path.dirname(__filename);
 const clientDistPath = path.resolve(__dirname, '../../client/dist');
 
 const app = express();
+if (process.env.TRUST_PROXY === '1') app.set('trust proxy', 1);
 const configuredOrigins = (process.env.CLIENT_ORIGINS || process.env.CLIENT_ORIGIN || (process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5173')).split(',').map(origin => origin.trim()).filter(Boolean);
 const allowedOrigins = new Set(configuredOrigins);
 const allowLocalhostPattern = /^http:\/\/(localhost|127\.0\.0\.1):(\d+)$/;
