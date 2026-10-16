@@ -7,9 +7,9 @@ dotenv.config({
 
 const fallbackMongoUri = 'mongodb://127.0.0.1:27017/portfolio';
 
-// Fail fast instead of letting queries sit in Mongoose's buffer for ~10s when
-// the database is unreachable. Callers check `isDbConnected()` / `waitForDb()`.
 mongoose.set('bufferCommands', false);
+
+let lastDbError = '';
 
 const connectDB = async () => {
   const uri = process.env.MONGO_URI || fallbackMongoUri;
@@ -22,9 +22,11 @@ const connectDB = async () => {
       maxPoolSize: 10,
     });
 
+    lastDbError = '';
     console.log('MongoDB Connected');
     return mongoose.connection;
   } catch (error) {
+    lastDbError = error.message;
     console.error('MongoDB connection failed:', error.message);
     throw error;
   }
@@ -32,11 +34,11 @@ const connectDB = async () => {
 
 export const isDbConnected = () => mongoose.connection.readyState === 1;
 
-/**
- * Resolves true once connected. If a connection attempt is in progress (e.g. a
- * serverless cold start), waits up to `timeoutMs` for it; otherwise resolves
- * false immediately so the request can fail fast with a 503.
- */
+export const getDbStatus = () => ({
+  state: mongoose.connection.readyState,
+  error: lastDbError,
+});
+
 export const waitForDb = (timeoutMs = 3000) => {
   if (isDbConnected()) return Promise.resolve(true);
   if (mongoose.connection.readyState !== 2) return Promise.resolve(false);

@@ -4,7 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
 import cors from 'cors';
-import connectDB from './config/db.js';
+import connectDB, { getDbStatus } from './config/db.js';
 import projectRoutes from './routes/projects.js';
 import adminRoutes from './routes/admin.js';
 import leadRoutes from './routes/leads.js';
@@ -47,7 +47,9 @@ const startDb = () =>
 
 startDb();
 
-app.get('/api/health', (_req, res) => res.json({ ok: true }));
+app.get('/api/health', (_req, res) =>
+  res.json({ ok: true, hasMongoUri: Boolean(process.env.MONGO_URI), ...getDbStatus() })
+);
 app.use('/api/admin', adminRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/leads', leadRoutes);
