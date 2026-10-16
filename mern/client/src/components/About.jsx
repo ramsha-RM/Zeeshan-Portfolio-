@@ -1,4 +1,5 @@
 import { about } from '../data/site.js';
+import aboutImage from '../assets/about-img.png';
 import Eyebrow from './ui/Eyebrow.jsx';
 import SocialRow from './ui/SocialRow.jsx';
 import useSplitText from '../hooks/useSplitText.js';
@@ -17,8 +18,7 @@ export default function About() {
       <div className="about">
         <div data-reveal>
           <div className="about__photo">
-            {/* drop the portrait in at src/assets/portrait.jpg and swap this div for an <img> */}
-            <div className="about__photoInner" />
+            <img className="about__photoInner" src={aboutImage} alt="Portrait of Zeeshan Munawar" loading="lazy" />
           </div>
           <div className="about__id">
             <SocialRow items={about.socials} />

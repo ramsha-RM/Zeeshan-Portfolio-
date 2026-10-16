@@ -119,6 +119,5 @@ over HTTPS.
 
 - Drop the four case-study images into `client/src/assets/` and set `image` on each
   project (seed or API).
-- Add the about portrait at `client/src/assets/portrait.jpg` and swap
-  `.about__photoInner` for an `<img>`.
+- The About portrait is loaded from `client/src/assets/about-img.png`.
 - Wire the "Book a free intro call" button to `POST /api/leads`.

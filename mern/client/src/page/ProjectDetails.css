@@ -48,7 +48,7 @@
 
 .pd__title {
   margin: 0;
-  font-family: 'Bayside Demo', var(--font-display);
+  font-family: var(--font-display-condensed);
   font-weight: 400;
   font-size: 198.5px;
   line-height: 1;

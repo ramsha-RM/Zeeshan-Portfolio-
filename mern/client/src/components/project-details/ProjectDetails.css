@@ -807,7 +807,7 @@
 
 .pd__title {
   margin: 0;
-  font-family: 'Bayside Demo', var(--font-display);
+  font-family: var(--font-display-condensed);
   font-weight: 400;
   font-size: 198.5px;
   line-height: 1;
@@ -1464,11 +1464,17 @@
 .pd--editable .pd__hero { padding-top: 0; }
 .pd--editable .pd__heroImageEdit { overflow: hidden; border-radius: var(--r-lg); }
 .pd.pd--editable { padding-top: clamp(92px, 9vw, 124px); }
-.pd__title { font-size: clamp(64px, 13.78vw, 198.5px); }
+.pd__title {
+  font-family: var(--font-display-condensed);
+  font-size: clamp(64px, 13.78vw, 198.5px);
+}
 .pd__swatch input[type='color'] { width: 54px; height: 54px; padding: 3px; border: 1px solid rgba(10, 11, 12, 0.08); border-radius: 50%; background: #fff; cursor: pointer; }
 
 @media (max-width: 768px) {
-  .pd__title { font-size: clamp(54px, 16vw, 118px); }
+  .pd__title {
+    font-family: var(--font-display-condensed);
+    font-size: clamp(54px, 16vw, 118px);
+  }
   .pd__script { font-size: clamp(42px, 12vw, 72px); }
   .pd__adminSettings { grid-template-columns: 1fr 1fr; padding: 18px; }
   .pd__adminSettingsHead { align-items: start; flex-direction: column; gap: 8px; }

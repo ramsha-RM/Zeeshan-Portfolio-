@@ -1,5 +1,11 @@
 /** Every string, colour-per-chip and row of the page. Edit copy here only. */
 
+const socials = [
+  { name: 'linkedin', label: 'LinkedIn', href: 'https://www.linkedin.com/in/zeeshan-munawar-uiux/' },
+  { name: 'instagram', label: 'Instagram', href: 'https://www.instagram.com/mshanm80/' },
+  { name: 'x', label: 'Twitter', href: 'https://x.com/Mrzeesh19117365' }
+];
+
 export const nav = [
   { id: 'top', label: 'Home' },
   { id: 'about', label: 'About' },
@@ -57,7 +63,7 @@ export const about = {
     { role: 'Senior Designer', company: 'PayPal', from: '2019', to: '2024' },
     { role: 'Product Designer', company: 'Meta', from: '2016', to: '2019' }
   ],
-  socials: ['instagram', 'linkedin', 'x']
+  socials
 };
 
 export const contact = {
@@ -69,5 +75,5 @@ export const contact = {
   ],
   cta: 'Book a free intro call',
   footerChip: '✦ Hanzo Studio, 2025',
-  socials: ['threads', 'x', 'linkedin', 'instagram']
+  socials
 };

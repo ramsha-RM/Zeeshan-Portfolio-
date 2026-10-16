@@ -5,10 +5,10 @@
 
 .about__photo {
   border-radius: 20px; overflow: hidden; transform: rotate(-1.4deg);
-  box-shadow: var(--shadow-photo); transition: transform 1s var(--ease);
+  background: var(--black); box-shadow: var(--shadow-photo); transition: transform 1s var(--ease);
 }
 .about__photo:hover { transform: rotate(0) scale(1.012); }
-.about__photoInner { aspect-ratio: 4 / 3.4; background: var(--black-2); }
+.about__photoInner { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: var(--black); }
 
 .about__id { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-top: 22px; }
 .about__name { text-align: right; font-size: 14px; }

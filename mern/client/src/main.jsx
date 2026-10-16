@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import '@fontsource/anton';
 import App from './App.jsx';
 import ProjectDetails from './page/ProjectDetails.jsx';
 import Admin from './page/Admin.jsx';
