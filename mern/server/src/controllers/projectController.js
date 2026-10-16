@@ -167,7 +167,7 @@ export const listProjects = async (_req, res) => {
   try {
     const projects = await Project.find({ published: true })
       .sort({ order: 1 })
-      .select('slug name tags image order published');
+      .select('slug name tags image order published details.heroImage');
 
     return res.json(projects);
   } catch (err) {

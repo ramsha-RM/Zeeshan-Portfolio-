@@ -164,39 +164,42 @@ export default function Projects() {
       </h2>
 
       <div className="projects" ref={zone}>
-        {items.map((p, i) => (
-          <article
-            className="project"
-            key={p.slug}
-            style={{
-              "--d": `${(i % 4) * 0.08}s`,
-            }}
-          >
-            <Link
-              className="project__plate"
-              to={`/projects/${p.slug}`}
-              aria-label={p.name}
+        {items.map((p, i) => {
+          const image = p.image || p.details?.heroImage;
+          return (
+            <article
+              className="project"
+              key={p.slug}
+              style={{
+                "--d": `${(i % 4) * 0.08}s`,
+              }}
             >
-              {p.image && (
-                <img
-                  src={p.image}
-                  alt={`${p.name} case study`}
-                  loading="lazy"
-                />
-              )}
-            </Link>
+              <Link
+                className="project__plate"
+                to={`/projects/${p.slug}`}
+                aria-label={p.name}
+              >
+                {image && (
+                  <img
+                    src={image}
+                    alt={`${p.name} case study`}
+                    loading="lazy"
+                  />
+                )}
+              </Link>
 
-            <div className="project__meta">
-              <span>{p.name}</span>
+              <div className="project__meta">
+                <span>{p.name}</span>
 
-              <span className="project__tags">
-                {p.tags.map((t) => (
-                  <span key={t}>{t}</span>
-                ))}
-              </span>
-            </div>
-          </article>
-        ))}
+                <span className="project__tags">
+                  {p.tags.map((t) => (
+                    <span key={t}>{t}</span>
+                  ))}
+                </span>
+              </div>
+            </article>
+          );
+        })}
       </div>
 
       {createPortal(
