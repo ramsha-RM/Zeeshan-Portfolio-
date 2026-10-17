@@ -3,8 +3,10 @@ import express from 'express';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
+import dns from 'node:dns/promises';
+import net from 'node:net';
 import cors from 'cors';
-import connectDB, { getDbStatus } from './config/db.js';
+import connectDB, { getDbStatus, isDbConnected } from './config/db.js';
 import projectRoutes from './routes/projects.js';
 import adminRoutes from './routes/admin.js';
 import leadRoutes from './routes/leads.js';
@@ -45,14 +47,67 @@ const startDb = () =>
     setTimeout(startDb, 15000);
   });
 
-startDb();
+let dbAttempt = null;
+const ensureDb = () => {
+  if (isDbConnected()) return Promise.resolve();
+  if (!dbAttempt) {
+    dbAttempt = connectDB()
+      .catch(() => {})
+      .finally(() => {
+        dbAttempt = null;
+      });
+  }
+  return dbAttempt;
+};
 
-app.get('/api/health', (_req, res) =>
+const dbGate = async (_req, _res, next) => {
+  if (process.env.VERCEL) {
+    await Promise.race([ensureDb(), new Promise((resolve) => setTimeout(resolve, 5000))]);
+  }
+  next();
+};
+
+if (!process.env.VERCEL) startDb();
+
+app.get('/api/health', dbGate, (_req, res) =>
   res.json({ ok: true, hasMongoUri: Boolean(process.env.MONGO_URI), ...getDbStatus() })
 );
+
+app.get('/api/net-test', async (_req, res) => {
+  const result = {};
+  try {
+    const host = new URL(process.env.MONGO_URI).hostname;
+    const records = await dns.resolveSrv(`_mongodb._tcp.${host}`);
+    result.srv = records.map((record) => `${record.name}:${record.port}`);
+    const target = records[0];
+    result.tcp = await new Promise((resolve) => {
+      const started = Date.now();
+      const socket = net.connect({ host: target.name, port: target.port, timeout: 6000 });
+      socket.once('connect', () => {
+        socket.destroy();
+        resolve(`connected in ${Date.now() - started}ms`);
+      });
+      socket.once('timeout', () => {
+        socket.destroy();
+        resolve('timeout: no response in 6s');
+      });
+      socket.once('error', (error) => resolve(`error: ${error.message}`));
+    });
+  } catch (error) {
+    result.error = error.message;
+  }
+  try {
+    const response = await fetch('https://api.ipify.org?format=json');
+    result.outboundIp = (await response.json()).ip;
+  } catch (error) {
+    result.outboundIp = `lookup failed: ${error.message}`;
+  }
+  res.json(result);
+});
+
 app.use('/api/admin', adminRoutes);
-app.use('/api/projects', projectRoutes);
-app.use('/api/leads', leadRoutes);
+app.use('/api/projects', dbGate, projectRoutes);
+app.use('/api/leads', dbGate, leadRoutes);
 app.use('/api/uploads', uploadRoutes);
 
 if (existsSync(clientDistPath)) {
