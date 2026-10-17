@@ -11,14 +11,25 @@ mongoose.set('bufferCommands', false);
 
 let lastDbError = '';
 
+const describeError = (error) => {
+  const servers = error?.reason?.servers;
+  if (servers && typeof servers.values === 'function') {
+    const details = [...servers.values()]
+      .map((server) => `${server.address}: ${server.error?.message || server.type}`)
+      .join(' | ');
+    if (details) return details;
+  }
+  return error?.message || 'Unknown error';
+};
+
 const connectDB = async () => {
   const uri = process.env.MONGO_URI || fallbackMongoUri;
 
   try {
     await mongoose.connect(uri, {
-      serverSelectionTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 15000,
       socketTimeoutMS: 20000,
-      connectTimeoutMS: 10000,
+      connectTimeoutMS: 15000,
       maxPoolSize: 10,
     });
 
@@ -26,8 +37,8 @@ const connectDB = async () => {
     console.log('MongoDB Connected');
     return mongoose.connection;
   } catch (error) {
-    lastDbError = error.message;
-    console.error('MongoDB connection failed:', error.message);
+    lastDbError = describeError(error);
+    console.error('MongoDB connection failed:', lastDbError);
     throw error;
   }
 };
