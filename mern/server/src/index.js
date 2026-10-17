@@ -4,7 +4,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
 import dns from 'node:dns/promises';
-import net from 'node:net';
+import tls from 'node:tls';
+import mongoose from 'mongoose';
 import cors from 'cors';
 import connectDB, { getDbStatus, isDbConnected } from './config/db.js';
 import projectRoutes from './routes/projects.js';
@@ -75,27 +76,56 @@ app.get('/api/health', dbGate, (_req, res) =>
 
 app.get('/api/net-test', async (_req, res) => {
   const result = {};
+  let target = null;
   try {
     const host = new URL(process.env.MONGO_URI).hostname;
     const records = await dns.resolveSrv(`_mongodb._tcp.${host}`);
+    target = records[0];
     result.srv = records.map((record) => `${record.name}:${record.port}`);
-    const target = records[0];
-    result.tcp = await new Promise((resolve) => {
+  } catch (error) {
+    result.srvError = error.message;
+  }
+
+  if (target) {
+    result.tls = await new Promise((resolve) => {
       const started = Date.now();
-      const socket = net.connect({ host: target.name, port: target.port, timeout: 6000 });
-      socket.once('connect', () => {
+      const socket = tls.connect({
+        host: target.name,
+        port: target.port,
+        servername: target.name,
+        timeout: 8000,
+      });
+      socket.once('secureConnect', () => {
+        const info = `${socket.getProtocol()} handshake ok in ${Date.now() - started}ms`;
         socket.destroy();
-        resolve(`connected in ${Date.now() - started}ms`);
+        resolve(info);
       });
       socket.once('timeout', () => {
         socket.destroy();
-        resolve('timeout: no response in 6s');
+        resolve('timeout: no TLS handshake in 8s');
       });
       socket.once('error', (error) => resolve(`error: ${error.message}`));
     });
-  } catch (error) {
-    result.error = error.message;
   }
+
+  const started = Date.now();
+  let probe;
+  try {
+    probe = await mongoose
+      .createConnection(process.env.MONGO_URI, { serverSelectionTimeoutMS: 12000 })
+      .asPromise();
+    await probe.db.admin().ping();
+    result.ping = `ok in ${Date.now() - started}ms`;
+  } catch (error) {
+    const servers = error.reason?.servers ? [...error.reason.servers.values()] : [];
+    result.ping = `failed after ${Date.now() - started}ms: ${error.name}: ${error.message}`;
+    result.servers = servers.map(
+      (server) => `${server.address}: ${server.type}${server.error ? ' / ' + server.error.name + ': ' + server.error.message : ''}`
+    );
+  } finally {
+    if (probe) await probe.close().catch(() => {});
+  }
+
   try {
     const response = await fetch('https://api.ipify.org?format=json');
     result.outboundIp = (await response.json()).ip;
