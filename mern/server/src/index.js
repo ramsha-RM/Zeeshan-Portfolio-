@@ -60,7 +60,6 @@ const ensureDb = () => {
   }
   return dbAttempt;
 };
-
 const dbGate = async (_req, _res, next) => {
   if (process.env.VERCEL) {
     await Promise.race([ensureDb(), new Promise((resolve) => setTimeout(resolve, 5000))]);
