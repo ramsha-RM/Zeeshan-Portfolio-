@@ -30,7 +30,7 @@
 
 //   return (
 //     <section id="projects" className="section shell" ref={sectionRef}>
-//       <Eyebrow data-reveal>Our Projects</Eyebrow>
+//       <Eyebrow data-reveal>Selected Projects</Eyebrow>
 
 //       <h2 className="h2" ref={heading}>
 //         Recent Case Studies
@@ -157,7 +157,7 @@ export default function Projects() {
 
   return (
     <section id="projects" className="section shell" ref={sectionRef}>
-      <Eyebrow data-reveal>Our Projects</Eyebrow>
+      <Eyebrow data-reveal>Selected Projects</Eyebrow>
 
       <h2 className="h2" ref={heading}>
         Recent Case Studies

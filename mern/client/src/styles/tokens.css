@@ -31,14 +31,25 @@
   --dot: #e0663a;
   --grad-top: #0a0b0c;
   --grad-bot: #7a7d7f;
+  --hero-ink: #030507;   /* Figma heading + stats */
+  --olive: #a4a400;      /* Figma "Meet the" */
 
   /* type */
   --font-display: 'Anton', 'Arial Narrow', sans-serif;
   --font-display-condensed: 'Bayside Condensed', 'Arial Narrow', sans-serif;
   --font-ui: 'Inter', 'Segoe UI', sans-serif;
-  --font-geo: 'Jost', 'Futura', 'Century Gothic', sans-serif;
+  /* UI face (labels, chips, meta, buttons) — Reem Kufi Fun as in Figma, Jost as fallback */
+  --font-geo: 'Reem Kufi Fun', 'Jost', 'Futura', 'Century Gothic', sans-serif;
   --font-serif: 'Instrument Serif', Georgia, serif;
   --font-script: 'Photograph Signature', 'Segoe Print', cursive;
+  /* Figma hero type. Relidux is a paid font: drop its file in /public/fonts and add an
+     @font-face above to use it; until then Orbitron stands in. Reem Kufi Fun and
+     Orbitron load from src/lib/fonts.js. */
+  --font-hero: 'Bayside', 'Anton', 'Arial Narrow', sans-serif;
+  --font-hero-script: 'Photograph Signature', 'Segoe Print', cursive;
+  --font-num: 'Relidux', 'Orbitron', var(--font-ui);
+  --font-label: 'Reem Kufi Fun', 'Jost', 'Futura', sans-serif;
+  --font-btn: var(--font-label);
 
   /* layout + motion */
   --shell: clamp(1100px, 62vw, 1440px);

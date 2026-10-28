@@ -10,70 +10,68 @@ export const nav = [
   { id: 'top', label: 'Home' },
   { id: 'about', label: 'About' },
   { id: 'projects', label: 'Projects' },
-  { id: 'experts', label: 'Experts' },
+  { id: 'experts', label: 'Expertise' },
   { id: 'contact', label: 'Contact' }
 ];
 
 export const hero = {
   script: 'Meet the',
   headline: 'Product Designer',
-  portraitAlt: 'The designer seated on a brown leather chesterfield sofa',
+  portraitAlt: 'Zeeshan Munawar, product designer, seated on a leather sofa',
   stats: [
-    { value: 3, suffix: '+', label: 'Years' },
-    { value: 20, suffix: '+', label: 'Clients' }
+    { value: 2, suffix: '+', label: 'Years' },
+    { value: 20, suffix: '+', label: 'Products' }
   ]
 };
 
 export const capabilities = {
   eyebrow: 'Hello!',
   statement:
-    'We help startups and enterprise to establish an emotional connection between their products and happy engaged customers',
+    'I turn complex business workflows into simple, clear web and mobile products that people enjoy using',
   left: [
     { label: 'Design systems', color: '#FF9F55', icon: 'grid' },
-    { label: 'UI/UX', color: '#3F3F3F', icon: 'cross' },
-    { label: 'Research', color: '#14AEFB', icon: 'search' }
+    { label: 'Dashboards', color: '#3F3F3F', icon: 'cross' },
+    { label: 'User flows', color: '#14AEFB', icon: 'search' }
   ],
   right: [
-    { label: 'Animation', color: '#4CD685', icon: 'play' },
+    { label: 'Wireframing', color: '#4CD685', icon: 'play' },
     { label: 'Prototyping', color: '#FF45AB', icon: 'frame' },
-    { label: 'Strategy', color: '#FFC531', icon: 'bars' }
+    { label: 'Dev handoff', color: '#FFC531', icon: 'bars' }
   ]
 };
 
 /** Fallback list — replaced at runtime by GET /api/projects when the API is up. */
 export const projects = [
-  { slug: 'strida', name: 'Strida', tags: ['portfolio', 'sidebar'], image: '' },
-  { slug: 'bravo', name: 'Bravo', tags: ['UI/UX', 'App'], image: '' },
-  { slug: 'nitro', name: 'Nitro', tags: ['Design System', 'Web'], image: '' },
-  { slug: 'fargo', name: 'Fargo', tags: ['SaaS', 'Web'], image: '' },
-  { slug: 'atlas', name: 'Atlas', tags: ['Branding', 'Platform'], image: '' },
-  { slug: 'solace', name: 'Solace', tags: ['Product', 'Mobile'], image: '' }
+  { slug: 'flujo', name: 'Flujo', tags: ['Healthcare', 'Web & Mobile'], image: '' },
+  { slug: 'aces-awards', name: 'ACES Awards', tags: ['Events', 'Dashboard'], image: '' },
+  { slug: 'deut', name: 'DEUT', tags: ['Enterprise', 'ERP'], image: '' },
+  { slug: 'wepaak', name: 'Wepaak', tags: ['Logistics', 'Web'], image: '' }
 ];
 
 export const about = {
   eyebrow: 'About Me',
-  heading: ['Pushing boundaries', 'since 2011'],
+  heading: ['Designing products', 'since 2024'],
   name: 'Zeeshan Munawar',
-  role: 'Product & UI-UX design',
+  role: 'UI/UX & Product Designer',
   bio:
-    'Zeeshan Munawar is a product designer known for his minimalist, expressive digital work. He helps startups and studios create clean interfaces and strong branding. Based in Utrecht, he blends function with emotion — and often spends his free time cycling or exploring generative art.',
+    'I’m a UI/UX and product designer who turns complex workflows into clear, usable interfaces. I design web apps, dashboards and mobile products end to end — from user flows and wireframes to high-fidelity prototypes, design systems and developer handoff — and work closely with engineering so what ships matches what was designed.',
   experience: [
-    { role: 'Freelance Practice', company: 'Hanzo Co.', from: '2011', to: 'Now' },
-    { role: 'Design Lead', company: 'Google', from: '2024', to: 'Now' },
-    { role: 'Senior Designer', company: 'PayPal', from: '2019', to: '2024' },
-    { role: 'Product Designer', company: 'Meta', from: '2016', to: '2019' }
+    { role: 'Associate Product & UI/UX Designer', company: 'Mercury Sols', from: 'Mar 2025', to: 'Now' },
+    { role: 'UI/UX Designer (Project-based)', company: 'Sledge', from: 'Mar 2026', to: 'Jun 2026' },
+    { role: 'UI/UX Designer', company: 'DevFor', from: 'Jul 2024', to: 'Feb 2025' }
   ],
   socials
 };
 
 export const contact = {
-  eyebrow: '2 spots available',
+  eyebrow: 'Open to remote & on-site roles',
   heading: ["Let's", 'Connect'],
   lines: [
-    'Feel free to contact me if having any questions.',
-    "I'm available for new projects or just for chatting."
+    'Have a product to design or a role to fill?',
+    'I’m available for new projects, full-time roles, or just a chat.'
   ],
-  cta: 'Book a free intro call',
-  footerChip: '✦ Hanzo Studio, 2025',
+  cta: 'Send Message',
+  email: 'mmzeeshanm8082@gmail.com',
+  footerChip: '© Zeeshan Munawar, 2026',
   socials
 };

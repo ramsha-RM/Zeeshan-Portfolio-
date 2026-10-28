@@ -1,0 +1,461 @@
+/* Primary button — adapted from Uiverse.io by marcelodolza.
+   Same layered build, hover shimmer, letter roll, arrow fly-out, splash and
+   outline trace as the original, recoloured to the site palette.
+   Variants: .zbtn--sm (header), .zbtn--light (dark backgrounds). */
+.zbtn {
+  --zb-text: #f2f0eb;
+  --zb-100: #c9c2b6;
+  --zb-200: #4a4a4a;
+  --zb-300: #2a2a2a;
+  --zb-400: #0b0b0b;
+  --zb-500: #000000;
+  --zb-shadow: 11 11 11;
+  --zb-trace: #f2f0eb;
+  --zb-h: 64px;
+  --zb-min: 200px;
+  --zb-fs: 18px;
+  --zb-pad: 28px;
+  --zb-gap: 14px;
+  --radius: 18px;
+
+  position: relative;
+  display: inline-block;
+  min-width: var(--zb-min);
+  height: var(--zb-h);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius);
+  background: transparent;
+  font-family: var(--font-btn);
+  font-size: var(--zb-fs);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  isolation: isolate;
+  flex: none;
+}
+.zbtn--sm {
+  --zb-h: 48px;
+  --zb-min: 148px;
+  --zb-fs: 15px;
+  --zb-pad: 18px;
+  --zb-gap: 10px;
+  --radius: 14px;
+}
+.zbtn--sm .bg::before {
+  box-shadow:
+    -5px 4px 0 0 rgb(var(--zb-shadow) / 25%),
+    -10px 8px 2px 0 rgb(var(--zb-shadow) / 12%),
+    -16px 12px 6px 0 rgb(var(--zb-shadow) / 6%);
+}
+.zbtn--tilt {
+  transform: rotate(353deg) skewX(4deg);
+}
+.zbtn--light {
+  --zb-text: #0b0b0b;
+  --zb-100: #ffffff;
+  --zb-200: #ffffff;
+  --zb-300: #f2f0eb;
+  --zb-400: #c9c2b6;
+  --zb-500: #6b6b6b;
+  --zb-shadow: 0 0 0;
+  --zb-trace: #0b0b0b;
+}
+
+.zbtn .bg {
+  display: block;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  filter: blur(1px);
+}
+.zbtn .bg::before,
+.zbtn .bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: calc(var(--radius) * 1.1);
+  background: var(--zb-500);
+}
+.zbtn .bg::before {
+  filter: blur(5px);
+  transition: all 0.3s ease;
+  box-shadow:
+    -7px 6px 0 0 rgb(var(--zb-shadow) / 30%),
+    -14px 12px 0 0 rgb(var(--zb-shadow) / 20%),
+    -21px 18px 4px 0 rgb(var(--zb-shadow) / 15%),
+    -28px 24px 8px 0 rgb(var(--zb-shadow) / 10%),
+    -35px 30px 12px 0 rgb(var(--zb-shadow) / 8%),
+    -42px 36px 16px 0 rgb(var(--zb-shadow) / 5%),
+    -56px 42px 20px 0 rgb(var(--zb-shadow) / 3%);
+}
+.zbtn .wrap {
+  display: block;
+  position: relative;
+  height: 100%;
+  border-radius: inherit;
+  overflow: hidden;
+  transform: translate(6px, -6px);
+  padding: 3px;
+  background: linear-gradient(to bottom, var(--zb-100) 0%, var(--zb-400) 100%);
+  transition: all 0.3s ease;
+}
+.zbtn .outline {
+  display: block;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0;
+  border-radius: inherit;
+  transition: all 0.4s ease;
+}
+.zbtn .outline::before {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  margin: auto;
+  width: 120px;
+  height: 300px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    #fff 50%,
+    transparent 100%
+  );
+  animation: zb-spin 3s linear infinite;
+  animation-play-state: paused;
+}
+.zbtn .content {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--zb-gap);
+  padding: 0 var(--zb-pad);
+  border-radius: calc(var(--radius) * 0.85);
+  pointer-events: none;
+  transition: all 0.3s ease;
+  background: linear-gradient(to bottom, var(--zb-300) 0%, var(--zb-400) 100%);
+  box-shadow:
+    inset -2px 12px 11px -5px var(--zb-200),
+    inset 1px -3px 11px 0 rgb(0 0 0 / 35%);
+}
+.zbtn .content::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  margin: auto;
+  width: 80%;
+  top: 45%;
+  bottom: 35%;
+  opacity: 0.7;
+  background: linear-gradient(to bottom, transparent, var(--zb-400));
+  filter: brightness(1.3) blur(5px);
+}
+.zbtn .char {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: pre;
+  transition: all 0.3s ease;
+}
+.zbtn .char span {
+  display: block;
+  position: relative;
+  color: transparent;
+}
+.zbtn .char.state-1 span {
+  animation: zb-charAppear 1.2s ease backwards calc(var(--i) * 0.03s);
+}
+.zbtn .char.state-1 span::before,
+.zbtn .char span::after {
+  content: attr(data-label);
+  position: absolute;
+  left: 0;
+  color: var(--zb-text);
+  text-shadow: -1px 1px 2px var(--zb-500);
+}
+.zbtn .char span::before {
+  opacity: 0;
+  transform: translateY(-100%);
+}
+.zbtn .char.state-2 {
+  position: absolute;
+  left: 50%;
+  translate: -50% 0;
+}
+.zbtn .char.state-2 span::after {
+  opacity: 1;
+}
+.zbtn .icon {
+  display: block;
+  z-index: 10;
+  animation: zb-resetArrow 0.8s cubic-bezier(0.7, -0.5, 0.3, 1.2) forwards;
+}
+.zbtn .icon .arrow,
+.zbtn .icon .arrow::before,
+.zbtn .icon .arrow::after {
+  height: 3px;
+  border-radius: 1px;
+  background-color: var(--zb-text);
+}
+.zbtn .icon .arrow::before,
+.zbtn .icon .arrow::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  width: 14px;
+  border-radius: 15px;
+  transform-origin: center right;
+  transition: all 0.3s ease;
+}
+.zbtn .icon .arrow {
+  display: block;
+  position: relative;
+  width: 24px;
+  transform: scale(0.9);
+  box-shadow: -2px 2px 5px var(--zb-400);
+  background: linear-gradient(to bottom, var(--zb-text), var(--zb-100));
+  animation: zb-swingArrow 1s ease-in-out infinite;
+  animation-play-state: paused;
+}
+.zbtn--sm .icon .arrow {
+  width: 20px;
+}
+.zbtn--sm .icon .arrow::before,
+.zbtn--sm .icon .arrow::after {
+  width: 11px;
+}
+.zbtn .icon .arrow::before {
+  top: 1px;
+  transform: rotate(44deg);
+  box-shadow: 1px -2px 3px -1px var(--zb-400);
+  animation: zb-rotateArrowLine 1s linear infinite;
+  animation-play-state: paused;
+}
+.zbtn .icon .arrow::after {
+  bottom: 1px;
+  transform: rotate(316deg);
+  box-shadow: -2px 2px 3px 0 var(--zb-400);
+  background: linear-gradient(200deg, var(--zb-text), var(--zb-100));
+  animation: zb-rotateArrowLine2 1s linear infinite;
+  animation-play-state: paused;
+}
+.zbtn .path {
+  position: absolute;
+  z-index: 12;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  stroke: var(--zb-trace);
+  stroke-dasharray: 150 480;
+  stroke-dashoffset: 150;
+  pointer-events: none;
+}
+.zbtn .splash {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 155%;
+  height: auto;
+  translate: -50% -50%;
+  stroke: var(--zb-400);
+  stroke-dasharray: 60 60;
+  stroke-dashoffset: 60;
+  pointer-events: none;
+}
+.zbtn--light .splash {
+  stroke: var(--zb-100);
+}
+
+.zbtn:hover .char.state-1 span::before {
+  animation: zb-charAppear 0.7s ease calc(var(--i) * 0.03s);
+}
+.zbtn:hover .char.state-1 span::after {
+  opacity: 1;
+  animation: zb-charDisappear 0.7s ease calc(var(--i) * 0.03s);
+}
+.zbtn:hover .wrap {
+  transform: translate(8px, -8px);
+}
+.zbtn:hover .outline {
+  opacity: 1;
+}
+.zbtn:hover .outline::before,
+.zbtn:hover .icon .arrow,
+.zbtn:hover .icon .arrow::before,
+.zbtn:hover .icon .arrow::after {
+  animation-play-state: running;
+}
+.zbtn:active .bg::before {
+  opacity: 0.7;
+  box-shadow:
+    -7px 6px 0 0 rgb(var(--zb-shadow) / 30%),
+    -14px 12px 0 0 rgb(var(--zb-shadow) / 18%),
+    -21px 18px 4px 0 rgb(var(--zb-shadow) / 10%);
+}
+.zbtn:active .content {
+  box-shadow:
+    inset -1px 12px 8px -5px rgb(0 0 0 / 40%),
+    inset 0 -3px 8px 0 var(--zb-200);
+}
+.zbtn:active .outline {
+  opacity: 0;
+}
+.zbtn:active .wrap {
+  transform: translate(3px, -3px);
+}
+.zbtn:active .splash {
+  animation: zb-splash 0.8s cubic-bezier(0.3, 0, 0, 1) forwards 0.05s;
+}
+.zbtn:focus .path {
+  animation: zb-path 1.6s ease forwards 0.2s;
+}
+.zbtn:focus .icon {
+  animation: zb-arrow 1s cubic-bezier(0.7, -0.5, 0.3, 1.5) forwards;
+}
+.zbtn .char.state-2 span::after,
+.zbtn:focus .char.state-1 span {
+  animation: zb-charDisappear 0.5s ease forwards calc(var(--i) * 0.03s);
+}
+.zbtn:focus .char.state-2 span::after {
+  animation: zb-charAppear 1s ease backwards calc(var(--i) * 0.03s);
+}
+.zbtn:focus-visible {
+  box-shadow:
+    0 0 0 3px var(--bg),
+    0 0 0 5px var(--ink);
+  border-radius: var(--radius);
+}
+.zbtn--light:focus-visible {
+  box-shadow:
+    0 0 0 3px var(--black-2),
+    0 0 0 5px #f4f4f3;
+}
+.zbtn:disabled {
+  cursor: wait;
+  opacity: 0.75;
+}
+.zbtn:hover,
+.zbtn:hover * {
+  color: inherit;
+}
+
+@keyframes zb-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes zb-charAppear {
+  0% {
+    transform: translateY(50%);
+    opacity: 0;
+    filter: blur(20px);
+  }
+  20% {
+    transform: translateY(70%);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-15%);
+    opacity: 1;
+    filter: blur(0);
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes zb-charDisappear {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-70%);
+    opacity: 0;
+    filter: blur(3px);
+  }
+}
+@keyframes zb-arrow {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(60px);
+    opacity: 0;
+  }
+  51% {
+    transform: translateX(-200px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(var(--arrow-shift, -128px));
+    opacity: 1;
+  }
+}
+@keyframes zb-swingArrow {
+  50% {
+    transform: translateX(5px) scale(0.9);
+  }
+}
+@keyframes zb-rotateArrowLine {
+  50% {
+    transform: rotate(30deg);
+  }
+  80% {
+    transform: rotate(55deg);
+  }
+}
+@keyframes zb-rotateArrowLine2 {
+  50% {
+    transform: rotate(330deg);
+  }
+  80% {
+    transform: rotate(300deg);
+  }
+}
+@keyframes zb-resetArrow {
+  0% {
+    transform: translateX(var(--arrow-shift, -128px));
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+@keyframes zb-path {
+  from {
+    stroke: #fff;
+  }
+  to {
+    stroke-dashoffset: -480;
+    stroke: var(--zb-trace);
+  }
+}
+@keyframes zb-splash {
+  to {
+    stroke-dasharray: 2 60;
+    stroke-dashoffset: -60;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zbtn *,
+  .zbtn *::before,
+  .zbtn *::after {
+    animation: none !important;
+  }
+  .zbtn .char.state-1 span::after {
+    opacity: 1;
+  }
+  .zbtn .char.state-2 {
+    display: none;
+  }
+}

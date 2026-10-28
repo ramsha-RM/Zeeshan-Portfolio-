@@ -427,6 +427,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Navbar from '../components/Navbar.jsx';
 import Contact from '../components/Contact.jsx';
+import AnimatedButton from '../components/ui/AnimatedButton.jsx';
 import ProjectCaseStudy from '../components/project-details/ProjectCaseStudy.jsx';
 import { EditableImage, EditableText } from '../components/project-details/InlineEdit.jsx';
 import { api } from '../lib/api.js';
@@ -544,9 +545,13 @@ function AdminGate({ onSubmit, error }) {
           onChange={(event) => setKey(event.target.value)}
           placeholder="Admin key"
         />
-        <button type="submit" className="adm__btn" disabled={busy}>
-          {busy ? 'Signing in…' : 'Sign in'}
-        </button>
+        <AnimatedButton
+          type="submit"
+          size="sm"
+          label={busy ? 'Signing in…' : 'Sign in'}
+          activeLabel={busy ? 'Signing in…' : 'Sign in'}
+          disabled={busy}
+        />
         {error && <small id="admin-key-error" className="adm__error" role="alert">{error}</small>}
       </form>
     </div>
@@ -827,9 +832,14 @@ export default function Admin() {
         {dirty && (
           <div className="pd__adminSaveBar shell">
             {/* <span>Unsaved changes</span> */}
-            <button type="button" className="adm__btn" onClick={saveProject} disabled={saving}>
-              {saving ? 'Saving…' : 'Save changes'}
-            </button>
+            <AnimatedButton
+              type="button"
+              size="sm"
+              label={saving ? 'Saving…' : 'Save changes'}
+              activeLabel={saving ? 'Saving…' : 'Save changes'}
+              onClick={saveProject}
+              disabled={saving}
+            />
           </div>
         )}
         {project && (

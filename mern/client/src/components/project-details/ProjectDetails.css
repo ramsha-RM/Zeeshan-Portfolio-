@@ -751,7 +751,7 @@
   .pd__adminSetting--cover { grid-column: auto; }
   .pd__adminSettingsHead { grid-column: auto; }
   .pd__adminSaveBar { align-items: stretch; flex-direction: column; }
-  .pd__adminSaveBar .adm__btn { width: 100%; }
+  .pd__adminSaveBar .zbtn { width: 100%; }
   .pd__blockTools { left: 0; right: auto; }
   .pd__editableBlock { padding-top: 52px; }
   .pd__heroCaption { max-width: 48%; }
@@ -1520,8 +1520,22 @@
   .pd__adminSetting--cover { grid-column: auto; }
   .pd__adminSettingsHead { grid-column: auto; }
   .pd__adminSaveBar { align-items: stretch; flex-direction: column; }
-  .pd__adminSaveBar .adm__btn { width: 100%; }
+  .pd__adminSaveBar .zbtn { width: 100%; }
   .pd__blockTools { left: 0; right: auto; }
   .pd__editableBlock { padding-top: 52px; }
   .pd__heroCaption { max-width: 48%; }
+}
+
+/* Case-study meta (Role / Client / Discipline / Year) — label + value scale. */
+.pd__metaItem { padding: 2px clamp(16px, 2vw, 32px); }
+.pd__metaItem dt {
+  font-family: var(--font-geo);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.pd__metaItem dd {
+  font-family: var(--font-geo);
+  font-size: clamp(15px, 1.15vw, 19px);
+  line-height: 1.35;
 }

@@ -1,35 +1,38 @@
+/* Header — Figma: logo 40px from the left edge; on the right a soft pill holding
+   "Let's Talk" and the icon-only menu button. Same on every page. */
 .nav {
   position: fixed;
   inset: 0 0 auto;
   z-index: 200;
-  padding: 14px 0;
-  border-bottom: 1px solid transparent;
-  transition:
-    padding 0.5s var(--ease),
-    background 0.5s var(--ease),
-    border-color 0.5s var(--ease);
-}
-.nav--stuck {
-  padding: 8px 0;
-  border-bottom-color: var(--line);
-  background: rgba(247, 247, 246, 0.82);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  padding: clamp(14px, 1.9vw, 27px) clamp(16px, 2.8vw, 40px);
+  pointer-events: none; /* only the logo and the pill take clicks */
 }
 .nav__inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
+  gap: 16px;
+}
+.nav__home,
+.nav__actions {
+  pointer-events: auto;
+}
+.nav__home {
+  display: flex;
 }
 .nav__logo {
-  display: flex;
-  width: 34px;
-  color: var(--ink);
-  transition: transform 0.8s var(--ease);
+  display: block;
+  width: clamp(40px, 4.1vw, 59px);
+  height: auto;
+  transition:
+    transform 0.8s var(--ease),
+    filter 0.5s var(--ease);
 }
-.nav__logo:hover {
+.nav__home:hover .nav__logo {
   transform: rotate(180deg);
+}
+.nav--open .nav__logo {
+  filter: invert(1);
 }
 
 .nav__actions {
@@ -39,6 +42,277 @@
   position: relative;
 }
 
+.nav__dock {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px;
+  border-radius: 80px;
+  background: rgba(235, 235, 235, 0.88);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  box-shadow: 0 18px 40px -24px rgba(10, 11, 12, 0.35);
+  transition:
+    background 0.5s var(--ease),
+    box-shadow 0.5s var(--ease);
+  animation: dock-in 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s backwards;
+}
+.nav--stuck .nav__dock {
+  box-shadow: 0 18px 40px -18px rgba(10, 11, 12, 0.45);
+}
+.nav--open .nav__dock {
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+.nav__dock .zbtn {
+  margin: 4px 0 0 6px;
+}
+@keyframes dock-in {
+  from {
+    opacity: 0;
+    transform: translateY(-24px) scale(0.92);
+  }
+}
+
+/* Menu button: three lines, ink flood on hover, morphs into an X when open */
+.nav__burger {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--line);
+  overflow: hidden;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition:
+    color 0.5s var(--ease),
+    transform 0.5s var(--ease);
+}
+.nav__burger::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--ink);
+  transform: scale(0);
+  transition: transform 0.5s var(--ease);
+}
+.nav__burger:hover::before,
+.nav__burger.is-open::before {
+  transform: scale(1);
+}
+.nav__burger:hover,
+.nav__burger.is-open {
+  color: #f4f4f3;
+}
+.nav__burger:active {
+  transform: scale(0.94);
+}
+.nav__burger:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+.nav--open .nav__burger:focus-visible {
+  outline-color: #f4f4f3;
+}
+
+.nav__burgerIcon {
+  position: relative;
+  z-index: 1;
+  width: 20px;
+  height: 14px;
+  display: block;
+}
+.nav__burgerIcon i {
+  position: absolute;
+  right: 0;
+  height: 1.6px;
+  border-radius: 2px;
+  background: currentColor;
+  transition:
+    transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+    width 0.45s var(--ease),
+    top 0.45s var(--ease),
+    opacity 0.3s;
+}
+.nav__burgerIcon i:nth-child(1) {
+  top: 0;
+  width: 100%;
+}
+.nav__burgerIcon i:nth-child(2) {
+  top: 6px;
+  width: 70%;
+}
+.nav__burgerIcon i:nth-child(3) {
+  top: 12px;
+  width: 45%;
+}
+.nav__burger:hover .nav__burgerIcon i:nth-child(2) {
+  width: 100%;
+  transition-delay: 0.05s;
+}
+.nav__burger:hover .nav__burgerIcon i:nth-child(3) {
+  width: 100%;
+  transition-delay: 0.1s;
+}
+.nav__burger.is-open .nav__burgerIcon i:nth-child(1) {
+  top: 6px;
+  width: 100%;
+  transform: rotate(135deg);
+}
+.nav__burger.is-open .nav__burgerIcon i:nth-child(2) {
+  width: 0;
+  opacity: 0;
+}
+.nav__burger.is-open .nav__burgerIcon i:nth-child(3) {
+  top: 6px;
+  width: 100%;
+  transform: rotate(-135deg);
+}
+
+/* Full-screen menu: a circle grows out of the menu button */
+.menu {
+  position: fixed;
+  inset: 0;
+  z-index: 190;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(100px, 10vw, 160px) clamp(18px, 4.2vw, 80px)
+    clamp(28px, 3vw, 56px);
+  background: var(--black);
+  color: #f2f0eb;
+  visibility: hidden;
+  clip-path: circle(0px at var(--mx, calc(100% - 60px)) var(--my, 50px));
+  transition:
+    clip-path 0.8s cubic-bezier(0.65, 0, 0.35, 1),
+    visibility 0s 0.8s;
+}
+.menu.is-open {
+  visibility: visible;
+  clip-path: circle(150vmax at var(--mx, calc(100% - 60px)) var(--my, 50px));
+  transition: clip-path 1s cubic-bezier(0.65, 0, 0.35, 1);
+}
+html.menu-open {
+  overflow: hidden;
+}
+
+.menu__links {
+  display: flex;
+  flex-direction: column;
+  margin-top: auto;
+}
+.menu__links a {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(14px, 1.6vw, 28px);
+  width: max-content;
+  font-family: var(--font-display);
+  font-size: clamp(48px, 7.4vw, 140px);
+  line-height: 1.02;
+  text-transform: uppercase;
+  color: #f2f0eb;
+  opacity: 0;
+  transform: translateY(40px);
+  transition:
+    transform 0.9s var(--ease),
+    opacity 0.8s var(--ease),
+    color 0.4s var(--ease),
+    letter-spacing 0.6s var(--ease);
+}
+.menu.is-open .menu__links a {
+  opacity: 1;
+  transform: none;
+  transition-delay: calc(0.06s * var(--i) + 0.35s);
+}
+.menu.is-open .menu__links:hover a {
+  transition-delay: 0s;
+}
+.menu__links a small {
+  font-family: var(--font-geo);
+  font-size: 13px;
+  color: #6b6b6b;
+  transition: color 0.4s;
+}
+.menu__links:hover a {
+  color: #3a3a3a;
+}
+.menu__links a:hover,
+.menu__links a:focus-visible {
+  color: #f2f0eb;
+  letter-spacing: 0.02em;
+}
+.menu__links a:hover small,
+.menu__links a[aria-current] small {
+  color: #c9c2b6;
+}
+.menu__links a:focus-visible {
+  outline: 2px solid #f2f0eb;
+  outline-offset: 6px;
+}
+
+.menu__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 22px;
+  margin-top: auto;
+  font-family: var(--font-geo);
+  font-size: 14px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 0.6s var(--ease),
+    transform 0.8s var(--ease);
+}
+.menu.is-open .menu__foot {
+  opacity: 1;
+  transform: none;
+  transition-delay: 0.7s;
+}
+.menu__foot a {
+  color: #8d8d8d;
+}
+.menu__foot a:hover {
+  color: #f2f0eb;
+}
+.menu__foot .menu__mail {
+  margin-right: auto;
+  color: #f2f0eb;
+}
+
+@media (max-width: 480px) {
+  .nav__dock {
+    padding: 6px;
+  }
+  .nav__dock .zbtn--sm {
+    --zb-min: 124px;
+    --zb-pad: 14px;
+    --zb-fs: 14px;
+    --zb-h: 44px;
+  }
+  .nav__burger {
+    width: 44px;
+    height: 44px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .menu,
+  .menu.is-open {
+    clip-path: none;
+  }
+  .nav__dock {
+    animation: none;
+  }
+}
+
+/* ---------- Admin tools ("More" panel on /admin) ---------- */
 .nav__adminTools {
   position: relative;
 }
@@ -161,169 +435,6 @@
 .nav__signOut {
   width: 100%;
   margin-top: 10px;
-}
-
-@media (max-width: 700px) {
-  .nav__inner {
-    gap: 12px;
-  }
-
-  .nav__actions {
-    gap: 8px;
-  }
-
-  .nav__panel {
-    min-width: min(78vw, 260px);
-  }
-}
-
-@media (max-width: 480px) {
-  .nav__actions {
-    width: auto;
-  }
-
-  .nav__panel {
-    right: -2px;
-    min-width: min(82vw, 220px);
-  }
-}
-/* hamburger — the same pill as "Let's Talk" */
-.nav__burger {
-  width: 42px;
-  height: 42px;
-  padding: 0;
-  margin: 0;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border: 1px solid #b8b8b8;
-  border-radius: 50%;
-  background: #fff;
-
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.06),
-    0 2px 5px rgba(0, 0, 0, 0.02);
-
-  cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-}
-
-.nav__burger:hover {
-  background: #fff;
-}
-
-.nav__burgerIcon {
-  position: relative;
-  width: 16px;
-  height: 12px;
-  display: block;
-}
-
-.nav__burgerIcon i {
-  position: absolute;
-
-  left: 50%;
-  top: 50%;
-
-  width: 13px;
-  height: 1.5px;
-
-  background: #000;
-  border-radius: 2px;
-
-  transform-origin: center;
-  transition: transform 0.4s var(--ease);
-}
-
-.nav__burgerIcon i:first-child {
-  transform: translate(-50%, -50%) translateY(-3px);
-}
-
-.nav__burgerIcon i:last-child {
-  transform: translate(-50%, -50%) translateY(3px);
-}
-
-.nav__burger.is-open .nav__burgerIcon i:first-child {
-  transform: translate(-50%, -50%) rotate(45deg);
-}
-
-.nav__burger.is-open .nav__burgerIcon i:last-child {
-  transform: translate(-50%, -50%) rotate(-45deg);
-}
-/* menu panel */
-.nav__panel {
-  position: absolute;
-  top: calc(100% + 14px);
-  right: 0;
-  min-width: 230px;
-  display: flex;
-  flex-direction: column;
-  padding: 14px 8px;
-  background: rgba(247, 247, 246, 0.86);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  box-shadow: 0 24px 48px -22px rgba(10, 11, 12, 0.35);
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transform: translateY(-10px);
-  transition:
-    opacity 0.5s var(--ease),
-    transform 0.5s var(--ease),
-    visibility 0.5s;
-}
-.nav__panel.is-open {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-  transform: translateY(0);
-}
-
-.nav__panel a {
-  position: relative;
-  padding: 9px 16px;
-  font-size: 15px;
-  color: var(--ink-2);
-  opacity: 0;
-  transform: translateX(14px);
-  transition:
-    opacity 0.5s var(--ease) var(--d),
-    transform 0.5s var(--ease) var(--d),
-    color 0.4s ease,
-    padding-left 0.4s var(--ease);
-}
-.nav__panel.is-open a {
-  opacity: 1;
-  transform: translateX(0);
-}
-.nav__panel a:hover {
-  color: var(--ink);
-  padding-left: 22px;
-}
-.nav__panel a.is-active {
-  color: var(--ink);
-}
-
-.nav__ul {
-  position: absolute;
-  left: 16px;
-  right: 16px;
-  bottom: 6px;
-  height: 1px;
-  background: var(--ink);
-  transform: scaleX(0);
-  transform-origin: right;
-  transition: transform 0.45s var(--ease);
-}
-.nav__panel a:hover .nav__ul,
-.nav__panel a.is-active .nav__ul {
-  transform: scaleX(1);
-  transform-origin: left;
 }
 
 /* Admin tools panel: on narrow screens the "More" button sits mid-bar, so a

@@ -1,11 +1,12 @@
 import { useEffect, useRef } from "react";
 
 /**
- * Measures the headline on an off-screen probe and sets font-size so the line
- * fills `fill`% of the content column at every viewport width. Never wraps.
- * The script line above it stays at 60% of the resolved size.
+ * Sizes the hero headline so it fills `fill`% of the content column at every
+ * viewport width (never wraps). The script line above it is `scriptRatio` × that
+ * size. The size is also published as `--hero-fs` on the section, so CSS can
+ * scale the letter mask and the portrait overlap with it.
  */
-export default function useHeadlineFit(fill = 78) {
+export default function useHeadlineFit(fill = 85, scriptRatio = 0.4) {
   const headline = useRef(null);
   const script = useRef(null);
 
@@ -19,24 +20,27 @@ export default function useHeadlineFit(fill = 78) {
         host.clientWidth -
         parseFloat(cs.paddingLeft) -
         parseFloat(cs.paddingRight);
+      const hs = getComputedStyle(h);
       const probe = document.createElement("span");
       probe.textContent = h.textContent;
       probe.style.cssText =
-        "position:fixed; left:-9999px;top:0;visibility:hidden;white-space:nowrap;" +
-        "text-transform:uppercase;letter-spacing:-.005em;font-size:200px;font-family:" +
-        getComputedStyle(h).fontFamily;
+        "position:fixed;left:-9999px;top:0;visibility:hidden;white-space:nowrap;" +
+        "text-transform:uppercase;letter-spacing:0;font-size:200px;" +
+        `font-family:${hs.fontFamily};font-weight:${hs.fontWeight}`;
       document.body.appendChild(probe);
       const w = probe.getBoundingClientRect().width;
       probe.remove();
       if (!w || !avail) return;
       const size = 200 * ((avail * (fill / 100)) / w);
       h.style.fontSize = size.toFixed(2) + "px";
+      h.closest("section")?.style.setProperty("--hero-fs", size.toFixed(2) + "px");
       if (script.current)
-        script.current.style.fontSize = (size * 0.6).toFixed(2) + "px";
+        script.current.style.fontSize = Math.max(size * scriptRatio, 22).toFixed(2) + "px"; // stays legible on phones
     };
 
     fit();
-    if (document.fonts) document.fonts.ready.then(fit);
+    document.fonts?.ready.then(fit);
+    document.fonts?.addEventListener?.("loadingdone", fit);
     let t;
     const onResize = () => {
       clearTimeout(t);
@@ -46,8 +50,9 @@ export default function useHeadlineFit(fill = 78) {
     return () => {
       clearTimeout(t);
       removeEventListener("resize", onResize);
+      document.fonts?.removeEventListener?.("loadingdone", fit);
     };
-  }, [fill]);
+  }, [fill, scriptRatio]);
 
   return { headline, script };
 }

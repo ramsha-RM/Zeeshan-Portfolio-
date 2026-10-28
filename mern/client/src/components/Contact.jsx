@@ -4,6 +4,7 @@ import Eyebrow from './ui/Eyebrow.jsx';
 import SocialRow from './ui/SocialRow.jsx';
 import useSplitText from '../hooks/useSplitText.js';
 import { api } from '../lib/api.js';
+import AnimatedButton from './ui/AnimatedButton.jsx';
 import './Contact.css';
 
 const EMPTY = { name: '', email: '', message: '', company: '' };
@@ -92,9 +93,16 @@ export default function Contact() {
               </label>
             </div>
             <div className="contact__formActions">
-              <button type="submit" className="contact__submit" disabled={sending}>
-                {sending ? 'Sending…' : contact.cta}
-              </button>
+              <AnimatedButton
+                type="submit"
+                tone="light"
+                className="contact__submit"
+                label={sending ? 'Sending…' : contact.cta}
+                activeLabel="Let’s Go"
+                disabled={sending}
+              />
+              <a className="contact__mail" href={`mailto:${contact.email}`}>{contact.email}</a>
+              
               <span
                 className={`contact__status contact__status--${state.status}`}
                 role={state.status === 'error' ? 'alert' : 'status'}
